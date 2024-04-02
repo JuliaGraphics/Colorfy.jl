@@ -12,6 +12,7 @@ const Values{T} = AbstractVector{<:T}
 Maps each value in `values` to a color. Colors can be obtained using the [`Colorfy.get`](@ref) function.
 
 ## Options
+
 * `alphas` - Scalar or a vector of color alphas (default to `fill(1, length(values))`);
 * `colorscheme` - Scheme name or a `ColorSchemes.ColorScheme` object (default to `defaultscheme(values)`);
 * `colorrange` - Tuple with minimum and maximum color values or a symbol that can be passed 
