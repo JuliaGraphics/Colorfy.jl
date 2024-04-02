@@ -3,6 +3,8 @@ module Colorfy
 using Colors
 using ColorSchemes
 
+export Colormap, colorfy
+
 # type alias to reduce typing
 const Values{T} = AbstractVector{<:T}
 
