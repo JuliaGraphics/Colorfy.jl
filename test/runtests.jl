@@ -42,28 +42,28 @@ using Test
     @test_throws ArgumentError Colorfier(values; alphas)
   end
 
-  @testset "get" begin
+  @testset "Colorfy.colors" begin
     values = rand(10)
     colorfier = Colorfier(values)
     colors = get(colorschemes[:viridis], values, :extrema)
-    @test get(colorfier) == coloralpha.(colors, 1)
+    @test Colorfy.colors(colorfier) == coloralpha.(colors, 1)
 
     colorfier = Colorfier(values, colorscheme=:grays, colorrange=(0.25, 0.75))
     colors = get(colorschemes[:grays], values, (0.25, 0.75))
-    @test get(colorfier) == coloralpha.(colors, 1)
+    @test Colorfy.colors(colorfier) == coloralpha.(colors, 1)
 
     colors = [colorant"red", colorant"green", colorant"blue", colorant"white", colorant"black"]
     values = ["red", "green", "blue", "white", "black"]
     colorfier = Colorfier(values)
-    @test get(colorfier) == coloralpha.(colors, 1)
+    @test Colorfy.colors(colorfier) == coloralpha.(colors, 1)
 
     values = [:red, :green, :blue, :white, :black]
     colorfier = Colorfier(values, alphas=0.5)
-    @test get(colorfier) == coloralpha.(colors, 0.5)
+    @test Colorfy.colors(colorfier) == coloralpha.(colors, 0.5)
 
     alphas = rand(5)
     colorfier = Colorfier(colors; alphas)
-    @test get(colorfier) == coloralpha.(colors, alphas)
+    @test Colorfy.colors(colorfier) == coloralpha.(colors, alphas)
   end
 
   @testset "colorfy" begin

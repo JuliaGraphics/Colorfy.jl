@@ -11,7 +11,7 @@ const Values{T} = AbstractVector{<:T}
 """
     Colorfier(values; [alphas, colorscheme, colorrange])
 
-Maps each value in `values` to a color. Colors can be obtained using the `get` function.
+Maps each value in `values` to a color. Colors can be obtained using the [`Colorfy.colors`](@ref) function.
 
 ## Options
 
@@ -35,9 +35,9 @@ Colorfier(values; alphas=fill(1, length(values)), colorscheme=defaultscheme(valu
 
 Shortcut to `Colorfy.get(Colorfier(values; kwargs...))` for convenience.
 
-See also [`Colorfier`](@ref), [`Colorfy.get`](@ref).
+See also [`Colorfier`](@ref), [`Colorfy.colors`](@ref).
 """
-colorfy(values; kwargs...) = get(Colorfier(values; kwargs...))
+colorfy(values; kwargs...) = colors(Colorfier(values; kwargs...))
 
 # --------
 # GETTERS
@@ -83,11 +83,11 @@ Default color scheme for `values`.
 defaultscheme(values) = colorschemes[:viridis]
 
 """
-    get(colorfier)
+    Colorfy.colors(colorfier)
 
 Colors mapped from the `colorfier` .
 """
-Base.get(colorfier::Colorfier) = coloralpha.(getcolors(colorfier), alphas(colorfier))
+colors(colorfier::Colorfier) = coloralpha.(getcolors(colorfier), alphas(colorfier))
 
 """
     Colorfy.getcolors(colorfier)
