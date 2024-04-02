@@ -33,29 +33,19 @@ colorrange(cmap::Colormap) = cmap.colorrange
 
 defaultscheme(values) = colorschemes[:viridis]
 
-function get(cmap::Colormap{<:Values{Number}})
-  colors = Base.get(colorscheme(cmap), values(cmap), colorrange(cmap))
-  setalpha(cmap, colors)
-end
+get(cmap::Colormap) = coloralpha.(getcolors(cmap), alphas(cmap))
 
-function get(cmap::Colormap{<:Values{AbstractString}})
-  colors = parse.(Ref(Colorant), values(cmap))
-  setalpha(cmap, colors)
-end
+getcolors(cmap::Colormap{<:Values{Number}}) = Base.get(colorscheme(cmap), values(cmap), colorrange(cmap))
 
-function get(cmap::Colormap{<:Values{Symbol}})
-  names = string.(values(cmap))
-  colors = parse.(Ref(Colorant), names)
-  setalpha(cmap, colors)
-end
+getcolors(cmap::Colormap{<:Values{AbstractString}}) = parse.(Ref(Colorant), values(cmap))
 
-get(cmap::Colormap{<:Values{Colorant}}) = setalpha(cmap, values(cmap))
+getcolors(cmap::Colormap{<:Values{Symbol}}) = parse.(Ref(Colorant), string.(values(cmap)))
+
+getcolors(cmap::Colormap{<:Values{Colorant}}) = values(cmap)
 
 # -----------------
 # HELPER FUNCTIONS
 # -----------------
-
-setalpha(cmap::Colormap, colors) = coloralpha.(colors, cmap.alphas)
 
 ascolorscheme(name::Symbol) = colorschemes[name]
 ascolorscheme(name::AbstractString) = ascolorscheme(Symbol(name))
