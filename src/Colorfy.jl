@@ -44,28 +44,28 @@ colorfy(values; kwargs...) = get(Colormap(values; kwargs...))
 """
     Colorfy.values(cmap)
 
-Values of the colormap `cmap`.
+Values of the `cmap` colormap.
 """
 values(cmap::Colormap) = cmap.values
 
 """
     Colorfy.alphas(cmap)
 
-Color alphas of the colormap `cmap`.
+Color alphas of the `cmap` colormap.
 """
 alphas(cmap::Colormap) = cmap.alphas
 
 """
     Colorfy.colorscheme(cmap)
 
-Color scheme of the colormap `cmap`.
+Color scheme of the `cmap` colormap.
 """
 colorscheme(cmap::Colormap) = cmap.colorscheme
 
 """
     Colorfy.colorrange(cmap)
 
-Color range of the colormap `cmap`.
+Color range of the `cmap` colormap.
 """
 colorrange(cmap::Colormap) = cmap.colorrange
 
@@ -83,14 +83,14 @@ defaultscheme(values) = colorschemes[:viridis]
 """
     Colorfy.get(cmap)
 
-Colors mapped from the colormap `cmap`.
+Colors mapped from the `cmap` colormap.
 """
 get(cmap::Colormap) = coloralpha.(getcolors(cmap), alphas(cmap))
 
 """
     Colorfy.getcolors(cmap)
 
-Function intended for developers that returns the mapped colors from the colormap `cmap` without the alphas. 
+Function intended for developers that returns the mapped colors from the `cmap` colormap without the alphas. 
 Alphas are applied in the `get` function.
 """
 getcolors(cmap::Colormap{<:Values{Number}}) = Base.get(colorscheme(cmap), values(cmap), colorrange(cmap))
