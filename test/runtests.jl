@@ -4,66 +4,66 @@ using ColorSchemes
 using Test
 
 @testset "Colorfy.jl" begin
-  @testset "Colormap" begin
+  @testset "Colorfier" begin
     values = rand(10)
-    cmap = Colormap(values)
-    @test Colorfy.values(cmap) == values
-    @test Colorfy.alphas(cmap) == fill(1, 10)
-    @test Colorfy.colorscheme(cmap) == colorschemes[:viridis]
-    @test Colorfy.colorrange(cmap) == :extrema
+    colorfier = Colorfier(values)
+    @test Colorfy.values(colorfier) == values
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == :extrema
 
-    cmap = Colormap(values, alphas=0.5)
-    @test Colorfy.values(cmap) == values
-    @test Colorfy.alphas(cmap) == fill(0.5, 10)
-    @test Colorfy.colorscheme(cmap) == colorschemes[:viridis]
-    @test Colorfy.colorrange(cmap) == :extrema
+    colorfier = Colorfier(values, alphas=0.5)
+    @test Colorfy.values(colorfier) == values
+    @test Colorfy.alphas(colorfier) == fill(0.5, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == :extrema
 
-    cmap = Colormap(values, colorscheme=:grays)
-    @test Colorfy.values(cmap) == values
-    @test Colorfy.alphas(cmap) == fill(1, 10)
-    @test Colorfy.colorscheme(cmap) == colorschemes[:grays]
-    @test Colorfy.colorrange(cmap) == :extrema
+    colorfier = Colorfier(values, colorscheme=:grays)
+    @test Colorfy.values(colorfier) == values
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:grays]
+    @test Colorfy.colorrange(colorfier) == :extrema
 
-    cmap = Colormap(values, colorscheme="grays")
-    @test Colorfy.values(cmap) == values
-    @test Colorfy.alphas(cmap) == fill(1, 10)
-    @test Colorfy.colorscheme(cmap) == colorschemes[:grays]
-    @test Colorfy.colorrange(cmap) == :extrema
+    colorfier = Colorfier(values, colorscheme="grays")
+    @test Colorfy.values(colorfier) == values
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:grays]
+    @test Colorfy.colorrange(colorfier) == :extrema
 
     alphas = rand(10)
-    cmap = Colormap(values; alphas, colorscheme=colorschemes[:grays], colorrange=(0.25, 0.75))
-    @test Colorfy.values(cmap) == values
-    @test Colorfy.alphas(cmap) == alphas
-    @test Colorfy.colorscheme(cmap) == colorschemes[:grays]
-    @test Colorfy.colorrange(cmap) == (0.25, 0.75)
+    colorfier = Colorfier(values; alphas, colorscheme=colorschemes[:grays], colorrange=(0.25, 0.75))
+    @test Colorfy.values(colorfier) == values
+    @test Colorfy.alphas(colorfier) == alphas
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:grays]
+    @test Colorfy.colorrange(colorfier) == (0.25, 0.75)
 
     # error: the number of alphas must be equal to the number of values
     alphas = rand(9)
-    @test_throws ArgumentError Colormap(values; alphas)
+    @test_throws ArgumentError Colorfier(values; alphas)
   end
 
   @testset "get" begin
     values = rand(10)
-    cmap = Colormap(values)
+    colorfier = Colorfier(values)
     colors = get(colorschemes[:viridis], values, :extrema)
-    @test get(cmap) == coloralpha.(colors, 1)
+    @test get(colorfier) == coloralpha.(colors, 1)
 
-    cmap = Colormap(values, colorscheme=:grays, colorrange=(0.25, 0.75))
+    colorfier = Colorfier(values, colorscheme=:grays, colorrange=(0.25, 0.75))
     colors = get(colorschemes[:grays], values, (0.25, 0.75))
-    @test get(cmap) == coloralpha.(colors, 1)
+    @test get(colorfier) == coloralpha.(colors, 1)
 
     colors = [colorant"red", colorant"green", colorant"blue", colorant"white", colorant"black"]
     values = ["red", "green", "blue", "white", "black"]
-    cmap = Colormap(values)
-    @test get(cmap) == coloralpha.(colors, 1)
+    colorfier = Colorfier(values)
+    @test get(colorfier) == coloralpha.(colors, 1)
 
     values = [:red, :green, :blue, :white, :black]
-    cmap = Colormap(values, alphas=0.5)
-    @test get(cmap) == coloralpha.(colors, 0.5)
+    colorfier = Colorfier(values, alphas=0.5)
+    @test get(colorfier) == coloralpha.(colors, 0.5)
 
     alphas = rand(5)
-    cmap = Colormap(colors; alphas)
-    @test get(cmap) == coloralpha.(colors, alphas)
+    colorfier = Colorfier(colors; alphas)
+    @test get(colorfier) == coloralpha.(colors, alphas)
   end
 
   @testset "colorfy" begin

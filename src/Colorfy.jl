@@ -3,13 +3,13 @@ module Colorfy
 using Colors
 using ColorSchemes
 
-export Colormap, colorfy
+export Colorfier, colorfy
 
 # type alias to reduce typing
 const Values{T} = AbstractVector{<:T}
 
 """
-    Colormap(values; [alphas, colorscheme, colorrange])
+    Colorfier(values; [alphas, colorscheme, colorrange])
 
 Maps each value in `values` to a color. Colors can be obtained using the `get` function.
 
@@ -20,56 +20,56 @@ Maps each value in `values` to a color. Colors can be obtained using the `get` f
 * `colorrange` - Tuple with minimum and maximum color values or a symbol that can be passed 
   to the `rangescale` argument of the `ColorSchemes.get` function (default to `:extrema`);
 """
-struct Colormap{V,A,S,R}
+struct Colorfier{V,A,S,R}
   values::V
   alphas::A
   colorscheme::S
   colorrange::R
 end
 
-Colormap(values; alphas=fill(1, length(values)), colorscheme=defaultscheme(values), colorrange=:extrema) =
-  Colormap(values, asalphas(alphas, values), ascolorscheme(colorscheme), colorrange)
+Colorfier(values; alphas=fill(1, length(values)), colorscheme=defaultscheme(values), colorrange=:extrema) =
+  Colorfier(values, asalphas(alphas, values), ascolorscheme(colorscheme), colorrange)
 
 """
     colorfy(values; kwargs...)
 
-Shortcut to `Colorfy.get(Colormap(values; kwargs...))` for convenience.
+Shortcut to `Colorfy.get(Colorfier(values; kwargs...))` for convenience.
 
-See also [`Colormap`](@ref), [`Colorfy.get`](@ref).
+See also [`Colorfier`](@ref), [`Colorfy.get`](@ref).
 """
-colorfy(values; kwargs...) = get(Colormap(values; kwargs...))
+colorfy(values; kwargs...) = get(Colorfier(values; kwargs...))
 
 # --------
 # GETTERS
 # --------
 
 """
-    Colorfy.values(cmap)
+    Colorfy.values(colorfier)
 
-Values of the `cmap` colormap.
+Values of the `colorfier`.
 """
-values(cmap::Colormap) = cmap.values
-
-"""
-    Colorfy.alphas(cmap)
-
-Color alphas of the `cmap` colormap.
-"""
-alphas(cmap::Colormap) = cmap.alphas
+values(colorfier::Colorfier) = colorfier.values
 
 """
-    Colorfy.colorscheme(cmap)
+    Colorfy.alphas(colorfier)
 
-Color scheme of the `cmap` colormap.
+Color alphas of the `colorfier`.
 """
-colorscheme(cmap::Colormap) = cmap.colorscheme
+alphas(colorfier::Colorfier) = colorfier.alphas
 
 """
-    Colorfy.colorrange(cmap)
+    Colorfy.colorscheme(colorfier)
 
-Color range of the `cmap` colormap.
+Color scheme of the `colorfier`.
 """
-colorrange(cmap::Colormap) = cmap.colorrange
+colorscheme(colorfier::Colorfier) = colorfier.colorscheme
+
+"""
+    Colorfy.colorrange(colorfier)
+
+Color range of the `colorfier`.
+"""
+colorrange(colorfier::Colorfier) = colorfier.colorrange
 
 # ----
 # API
@@ -83,25 +83,26 @@ Default color scheme for `values`.
 defaultscheme(values) = colorschemes[:viridis]
 
 """
-    get(cmap)
+    get(colorfier)
 
-Colors mapped from the `cmap` colormap.
+Colors mapped from the `colorfier` .
 """
-Base.get(cmap::Colormap) = coloralpha.(getcolors(cmap), alphas(cmap))
+Base.get(colorfier::Colorfier) = coloralpha.(getcolors(colorfier), alphas(colorfier))
 
 """
-    Colorfy.getcolors(cmap)
+    Colorfy.getcolors(colorfier)
 
-Function intended for developers that returns the mapped colors from the `cmap` colormap without the alphas. 
+Function intended for developers that returns the mapped colors from the `colorfier` without the alphas. 
 Alphas are applied in the `get` function.
 """
-getcolors(cmap::Colormap{<:Values{Number}}) = get(colorscheme(cmap), values(cmap), colorrange(cmap))
+getcolors(colorfier::Colorfier{<:Values{Number}}) =
+  get(colorscheme(colorfier), values(colorfier), colorrange(colorfier))
 
-getcolors(cmap::Colormap{<:Values{AbstractString}}) = parse.(Ref(Colorant), values(cmap))
+getcolors(colorfier::Colorfier{<:Values{AbstractString}}) = parse.(Ref(Colorant), values(colorfier))
 
-getcolors(cmap::Colormap{<:Values{Symbol}}) = parse.(Ref(Colorant), string.(values(cmap)))
+getcolors(colorfier::Colorfier{<:Values{Symbol}}) = parse.(Ref(Colorant), string.(values(colorfier)))
 
-getcolors(cmap::Colormap{<:Values{Colorant}}) = values(cmap)
+getcolors(colorfier::Colorfier{<:Values{Colorant}}) = values(colorfier)
 
 # -----------------
 # HELPER FUNCTIONS
