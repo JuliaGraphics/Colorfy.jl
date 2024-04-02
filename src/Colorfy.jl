@@ -88,25 +88,27 @@ defaultscheme(values) = colorschemes[:viridis]
 Colors mapped from the `colorfier` .
 """
 function colors(colorfier::Colorfier)
-  # find invalid and valid indices
+  # find invalid indices
   isinvalid(v) = ismissing(v) || (v isa Number && !isfinite(v))
   vals = values(colorfier)
   iinds = findall(isinvalid, vals)
-  vinds = setdiff(1:length(vals), iinds)
 
-  # invalid values are assigned full transparency
-  colors = Vector{Colorant}(undef, length(vals))
-  colors[iinds] .= colorant"transparent"
-
-  # set colors of valid values
-  if !isempty(vinds)
+  if isempty(iinds)
+    coloralpha.(getcolors(colorfier), alphas(colorfier))
+  else
+    # invalid values are assigned full transparency
+    vcolors = Vector{Colorant}(undef, length(vals))
+    vcolors[iinds] .= colorant"transparent"
+    
+    # set colors of valid values
+    vinds = setdiff(1:length(vals), iinds)
     vvals = coalesce.(vals[vinds])
     valphas = alphas(colorfier)[vinds]
-    vcolors = getcolors(colorfier, vvals)
-    colors[vinds] .= coloralpha.(vcolors, valphas)
-  end
+    vcolorfier = Colorfier(vvals, valphas, colorscheme(colorfier), colorrange(colorfier))
+    vcolors[vinds] .= colors(vcolorfier)
 
-  colors
+    vcolors
+  end
 end
 
 """
@@ -115,13 +117,14 @@ end
 Function intended for developers that returns the mapped colors from the `colorfier` without the alphas. 
 Alphas are applied in the `Colorfy.colors` function.
 """
-getcolors(colorfier::Colorfier, values::Values{Number}) = get(colorscheme(colorfier), values, colorrange(colorfier))
+getcolors(colorfier::Colorfier{<:Values{Number}}) =
+  get(colorscheme(colorfier), values(colorfier), colorrange(colorfier))
 
-getcolors(::Colorfier, values::Values{AbstractString}) = parse.(Ref(Colorant), values)
+getcolors(colorfier::Colorfier{<:Values{AbstractString}}) = parse.(Ref(Colorant), values(colorfier))
 
-getcolors(::Colorfier, values::Values{Symbol}) = parse.(Ref(Colorant), string.(values))
+getcolors(colorfier::Colorfier{<:Values{Symbol}}) = parse.(Ref(Colorant), string.(values(colorfier)))
 
-getcolors(::Colorfier, values::Values{Colorant}) = values
+getcolors(colorfier::Colorfier{<:Values{Colorant}}) = values(colorfier)
 
 # -----------------
 # HELPER FUNCTIONS
