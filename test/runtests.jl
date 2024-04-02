@@ -42,28 +42,28 @@ using Test
     @test_throws ArgumentError Colormap(values; alphas)
   end
 
-  @testset "Colorfy.get" begin
+  @testset "get" begin
     values = rand(10)
     cmap = Colormap(values)
     colors = get(colorschemes[:viridis], values, :extrema)
-    @test Colorfy.get(cmap) == coloralpha.(colors, 1)
+    @test get(cmap) == coloralpha.(colors, 1)
 
     cmap = Colormap(values, colorscheme=:grays, colorrange=(0.25, 0.75))
     colors = get(colorschemes[:grays], values, (0.25, 0.75))
-    @test Colorfy.get(cmap) == coloralpha.(colors, 1)
+    @test get(cmap) == coloralpha.(colors, 1)
 
     colors = [colorant"red", colorant"green", colorant"blue", colorant"white", colorant"black"]
     values = ["red", "green", "blue", "white", "black"]
     cmap = Colormap(values)
-    @test Colorfy.get(cmap) == coloralpha.(colors, 1)
+    @test get(cmap) == coloralpha.(colors, 1)
 
     values = [:red, :green, :blue, :white, :black]
     cmap = Colormap(values, alphas=0.5)
-    @test Colorfy.get(cmap) == coloralpha.(colors, 0.5)
+    @test get(cmap) == coloralpha.(colors, 0.5)
 
     alphas = rand(5)
     cmap = Colormap(colors; alphas)
-    @test Colorfy.get(cmap) == coloralpha.(colors, alphas)
+    @test get(cmap) == coloralpha.(colors, alphas)
   end
 
   @testset "colorfy" begin

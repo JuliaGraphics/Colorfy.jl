@@ -11,7 +11,7 @@ const Values{T} = AbstractVector{<:T}
 """
     Colormap(values; [alphas, colorscheme, colorrange])
 
-Maps each value in `values` to a color. Colors can be obtained using the [`Colorfy.get`](@ref) function.
+Maps each value in `values` to a color. Colors can be obtained using the `get` function.
 
 ## Options
 
@@ -83,11 +83,11 @@ Default color scheme for `values`.
 defaultscheme(values) = colorschemes[:viridis]
 
 """
-    Colorfy.get(cmap)
+    get(cmap)
 
 Colors mapped from the `cmap` colormap.
 """
-get(cmap::Colormap) = coloralpha.(getcolors(cmap), alphas(cmap))
+Base.get(cmap::Colormap) = coloralpha.(getcolors(cmap), alphas(cmap))
 
 """
     Colorfy.getcolors(cmap)
@@ -95,7 +95,7 @@ get(cmap::Colormap) = coloralpha.(getcolors(cmap), alphas(cmap))
 Function intended for developers that returns the mapped colors from the `cmap` colormap without the alphas. 
 Alphas are applied in the `get` function.
 """
-getcolors(cmap::Colormap{<:Values{Number}}) = Base.get(colorscheme(cmap), values(cmap), colorrange(cmap))
+getcolors(cmap::Colormap{<:Values{Number}}) = get(colorscheme(cmap), values(cmap), colorrange(cmap))
 
 getcolors(cmap::Colormap{<:Values{AbstractString}}) = parse.(Ref(Colorant), values(cmap))
 
