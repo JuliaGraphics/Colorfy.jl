@@ -89,7 +89,7 @@ Colors mapped from the `colorfier` .
 """
 function colors(colorfier::Colorfier)
   # find invalid and valid indices
-  isinvalid(v) = ismissing(v) || (v isa Number && !isnumeric(v))
+  isinvalid(v) = ismissing(v) || (v isa Number && !isfinite(v))
   vals = values(colorfier)
   iinds = findall(isinvalid, vals)
   vinds = setdiff(1:length(vals), iinds)
