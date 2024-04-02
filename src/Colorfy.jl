@@ -6,6 +6,17 @@ using ColorSchemes
 # type alias to reduce typing
 const Values{T} = AbstractVector{<:T}
 
+"""
+    Colormap(values; [alphas, colorscheme, colorrange])
+
+Maps each value in `values` to a color. Colors can be obtained using the [`Colorfy.get`](@ref) function.
+
+## Options
+* `alphas` - Scalar or a vector of color alphas (default to `fill(1, length(values))`);
+* `colorscheme` - Scheme name or a `ColorSchemes.ColorScheme` object (default to `defaultscheme(values)`);
+* `colorrange` - Tuple with minimum and maximum color values or a symbol that can be passed 
+  to the `rangescale` argument of the `ColorSchemes.get` function (default to `:extrema`);
+"""
 struct Colormap{V,A,S,R}
   values::V
   alphas::A
@@ -16,25 +27,71 @@ end
 Colormap(values; alphas=fill(1, length(values)), colorscheme=defaultscheme(values), colorrange=:extrema) =
   Colormap(values, asalphas(alphas, values), ascolorscheme(colorscheme), colorrange)
 
+"""
+    colorfy(values; kwargs...)
+
+Shortcut to `Colorfy.get(Colormap(values; kwargs...))` for convenience.
+
+See also [`Colormap`](@ref), [`Colorfy.get`](@ref).
+"""
 colorfy(values; kwargs...) = get(Colormap(values; kwargs...))
 
 # --------
 # GETTERS
 # --------
 
+"""
+    Colorfy.values(cmap)
+
+Values of the colormap `cmap`.
+"""
 values(cmap::Colormap) = cmap.values
+
+"""
+    Colorfy.alphas(cmap)
+
+Color alphas of the colormap `cmap`.
+"""
 alphas(cmap::Colormap) = cmap.alphas
+
+"""
+    Colorfy.colorscheme(cmap)
+
+Color scheme of the colormap `cmap`.
+"""
 colorscheme(cmap::Colormap) = cmap.colorscheme
+
+"""
+    Colorfy.colorrange(cmap)
+
+Color range of the colormap `cmap`.
+"""
 colorrange(cmap::Colormap) = cmap.colorrange
 
 # ----
 # API
 # ----
 
+"""
+    Colorfy.defaultscheme(values)
+
+Default color scheme for `values`.
+"""
 defaultscheme(values) = colorschemes[:viridis]
 
+"""
+    Colorfy.get(cmap)
+
+Colors mapped from the colormap `cmap`.
+"""
 get(cmap::Colormap) = coloralpha.(getcolors(cmap), alphas(cmap))
 
+"""
+    Colorfy.getcolors(cmap)
+
+Function intended for developers that returns the mapped colors from the colormap `cmap` without the alphas. 
+Alphas are applied in the `get` function.
+"""
 getcolors(cmap::Colormap{<:Values{Number}}) = Base.get(colorscheme(cmap), values(cmap), colorrange(cmap))
 
 getcolors(cmap::Colormap{<:Values{AbstractString}}) = parse.(Ref(Colorant), values(cmap))
