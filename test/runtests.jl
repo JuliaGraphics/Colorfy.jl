@@ -74,4 +74,13 @@ using Test
     colors = get(colorschemes[:grays], values, (0.25, 0.75))
     @test colorfy(values, colorscheme=:grays, colorrange=(0.25, 0.75)) == coloralpha.(colors, 1)
   end
+
+  @testset "Invalid values" begin
+    values = [0.1, missing, 0.2, NaN, 0.3, Inf, 0.4, -Inf, 0.5]
+    colors = colorfy(values, alphas=0.5)
+    @test colors[2] == colorant"transparent"
+    @test colors[4] == colorant"transparent"
+    @test colors[6] == colorant"transparent"
+    @test colors[8] == colorant"transparent"
+  end
 end
