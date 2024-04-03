@@ -6,6 +6,7 @@ module Colorfy
 
 using Colors
 using ColorSchemes
+using Dates
 
 export Colorfier, colorfy
 
@@ -136,6 +137,24 @@ getcolors(colorfier::Colorfier{<:Values{AbstractString}}) = parse.(Ref(Colorant)
 getcolors(colorfier::Colorfier{<:Values{Symbol}}) = parse.(Ref(Colorant), string.(values(colorfier)))
 
 getcolors(colorfier::Colorfier{<:Values{Colorant}}) = values(colorfier)
+
+function getcolors(colorfier::Colorfier{<:Values{DateTime}})
+  dvalues = datetime2unix.(values(colorfier))
+  dalphas = alphas(colorfier)
+  dcolorscheme = colorscheme(colorfier)
+  dcolorrange = colorrange(colorfier)
+  dcolorfier = Colorfier(dvalues, dalphas, dcolorscheme, dcolorrange)
+  getcolors(dcolorfier)
+end
+
+function getcolors(colorfier::Colorfier{<:Values{Date}})
+  dvalues = map(d -> datetime2unix(DateTime(d)), values(colorfier))
+  dalphas = alphas(colorfier)
+  dcolorscheme = colorscheme(colorfier)
+  dcolorrange = colorrange(colorfier)
+  dcolorfier = Colorfier(dvalues, dalphas, dcolorscheme, dcolorrange)
+  getcolors(dcolorfier)
+end
 
 # -----------------
 # HELPER FUNCTIONS

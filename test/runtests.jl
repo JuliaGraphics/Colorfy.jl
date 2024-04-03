@@ -4,6 +4,7 @@ using ColorSchemes
 using CategoricalArrays
 using Distributions
 using Unitful
+using Dates
 using Test
 
 @testset "Colorfy.jl" begin
@@ -87,11 +88,16 @@ using Test
     @test colors[8] == colorant"transparent"
   end
 
-  @testset "Unitful" begin
-    values = rand(10) * u"m"
-    @test colorfy(values) == colorfy(ustrip.(values))
-    @test colorfy(values, alphas=0.5) == colorfy(ustrip.(values), alphas=0.5)
-    @test colorfy(values, colorrange=(0.25, 0.75)) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
+  @testset "Dates" begin
+    values = now() .+ Day.(1:10)
+    colors = colorfy(datetime2unix.(values))
+    @test colorfy(values) == colors
+    @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
+
+    values = today() .+ Day.(1:10)
+    colors = colorfy(datetime2unix.(DateTime.(values)))
+    @test colorfy(values) == colors
+    @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
   end
 
   @testset "CategoricalArrays" begin
@@ -113,5 +119,12 @@ using Test
     values = Normal.(means, fill(0.5, 10))
     @test colorfy(values) == coloralpha.(colors, 1)
     @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
+  end
+
+  @testset "Unitful" begin
+    values = rand(10) * u"m"
+    @test colorfy(values) == colorfy(ustrip.(values))
+    @test colorfy(values, alphas=0.5) == colorfy(ustrip.(values), alphas=0.5)
+    @test colorfy(values, colorrange=(0.25, 0.75)) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
   end
 end

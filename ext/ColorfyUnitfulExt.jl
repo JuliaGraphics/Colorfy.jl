@@ -13,8 +13,8 @@ function Colorfy.getcolors(colorfier::Colorfier{<:Values{Quantity}})
   alphas = Colorfy.alphas(colorfier)
   colorscheme = Colorfy.colorscheme(colorfier)
   colorrange = Colorfy.colorrange(colorfier)
-  unitless = Colorfier(values; alphas, colorscheme, colorrange)
-  Colorfy.getcolors(unitless)
+  ucolorfier = Colorfier(values; alphas, colorscheme, colorrange)
+  Colorfy.getcolors(ucolorfier)
 end
 
 end
