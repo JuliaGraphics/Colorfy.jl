@@ -21,9 +21,9 @@ Maps each value in `values` to a color. Colors can be obtained using the [`Color
 ## Options
 
 * `alphas` - Scalar or a vector of color alphas (default to `Colorfy.defaultalphas(values)`);
-* `colorscheme` - Scheme name or a `ColorSchemes.ColorScheme` object (default to `Colorfy.defaultscheme(values)`);
+* `colorscheme` - Scheme name or a `ColorSchemes.ColorScheme` object (default to `Colorfy.defaultcolorscheme(values)`);
 * `colorrange` - Tuple with minimum and maximum color values or a symbol that can be passed 
-  to the `rangescale` argument of the `ColorSchemes.get` function (default to `:extrema`);
+  to the `rangescale` argument of the `ColorSchemes.get` function (default to `Colorfy.defaultcolorrange(values)`);
 """
 struct Colorfier{V,A,S,R}
   values::V
@@ -32,8 +32,12 @@ struct Colorfier{V,A,S,R}
   colorrange::R
 end
 
-Colorfier(values; alphas=defaultalphas(values), colorscheme=defaultscheme(values), colorrange=:extrema) =
-  Colorfier(values, asalphas(alphas, values), ascolorscheme(colorscheme), colorrange)
+Colorfier(
+  values;
+  alphas=defaultalphas(values),
+  colorscheme=defaultcolorscheme(values),
+  colorrange=defaultcolorrange(values)
+) = Colorfier(values, asalphas(alphas, values), ascolorscheme(colorscheme), colorrange)
 
 """
     colorfy(values; kwargs...)
@@ -101,11 +105,18 @@ Default color alphas for `values`.
 defaultalphas(values) = fill(1, length(values))
 
 """
-    Colorfy.defaultscheme(values)
+    Colorfy.defaultcolorscheme(values)
 
 Default color scheme for `values`.
 """
-defaultscheme(_) = colorschemes[:viridis]
+defaultcolorscheme(_) = colorschemes[:viridis]
+
+"""
+    Colorfy.defaultcolorrange(values)
+
+Default color range for `values`.
+"""
+defaultcolorrange(_) = :extrema
 
 """
     Colorfy.colors(colorfier)

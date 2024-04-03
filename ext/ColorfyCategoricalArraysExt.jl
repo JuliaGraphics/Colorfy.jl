@@ -15,6 +15,6 @@ function Colorfy.getcolors(colorfier::Colorfier{<:Values{CategoricalValue}})
   colorscheme[levelcode.(values)]
 end
 
-Colorfy.defaultscheme(::Values{CategoricalValue}) = colorschemes[:Set3_9]
+Colorfy.defaultcolorscheme(::Values{CategoricalValue}) = colorschemes[:Set3_9]
 
 end
