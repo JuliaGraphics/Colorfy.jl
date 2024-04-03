@@ -109,6 +109,7 @@ using Test
     colors = colorfy(means)
     @test colorfy(values) == coloralpha.(colors, alphas)
     @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
+
     values = Normal.(means, fill(0.5, 10))
     @test colorfy(values) == coloralpha.(colors, 1)
     @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
