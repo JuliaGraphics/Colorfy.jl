@@ -1,3 +1,7 @@
+# -----------------------------------------------------------------
+# Licensed under the MIT License. See LICENSE in the project root.
+# -----------------------------------------------------------------
+
 module Colorfy
 
 using Colors
@@ -88,10 +92,11 @@ defaultscheme(values) = colorschemes[:viridis]
 Colors mapped from the `colorfier` .
 """
 function colors(colorfier::Colorfier)
-  # find invalid indices
+  # find invalid and valid indices
   isinvalid(v) = ismissing(v) || (v isa Number && !isfinite(v))
   vals = values(colorfier)
   iinds = findall(isinvalid, vals)
+  vinds = setdiff(1:length(vals), iinds)
 
   if isempty(iinds)
     coloralpha.(getcolors(colorfier), alphas(colorfier))
@@ -101,7 +106,6 @@ function colors(colorfier::Colorfier)
     vcolors[iinds] .= colorant"transparent"
     
     # set colors of valid values
-    vinds = setdiff(1:length(vals), iinds)
     vvals = coalesce.(vals[vinds])
     valphas = alphas(colorfier)[vinds]
     vcolorfier = Colorfier(vvals, valphas, colorscheme(colorfier), colorrange(colorfier))

@@ -1,6 +1,7 @@
 using Colorfy
 using Colors
 using ColorSchemes
+using Unitful
 using Test
 
 @testset "Colorfy.jl" begin
@@ -82,5 +83,12 @@ using Test
     @test colors[4] == colorant"transparent"
     @test colors[6] == colorant"transparent"
     @test colors[8] == colorant"transparent"
+  end
+
+  @testset "Unitful" begin
+    values = rand(10) * u"m"
+    @test colorfy(values) == colorfy(ustrip.(values))
+    @test colorfy(values, alphas=0.5) == colorfy(ustrip.(values), alphas=0.5)
+    @test colorfy(values, colorrange=(0.25, 0.75)) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
   end
 end
