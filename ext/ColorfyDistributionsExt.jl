@@ -10,11 +10,8 @@ using Distributions: Distribution, location, scale
 
 function Colorfy.getcolors(colorfier::Colorfier{<:Values{Distribution}})
   values = location.(Colorfy.values(colorfier))
-  alphas = Colorfy.alphas(colorfier)
-  colorscheme = Colorfy.colorscheme(colorfier)
-  colorrange = Colorfy.colorrange(colorfier)
-  lcolorfier = Colorfier(values; alphas, colorscheme, colorrange)
-  Colorfy.getcolors(lcolorfier)
+  dcolorfier = Colorfier(colorfier; values)
+  Colorfy.getcolors(dcolorfier)
 end
 
 function Colorfy.defaultalphas(values::Values{Distribution})
