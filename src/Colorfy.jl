@@ -31,7 +31,7 @@ struct Colorfier{V,A,S,R}
   colorrange::R
 end
 
-Colorfier(values; alphas=fill(1, length(values)), colorscheme=defaultscheme(values), colorrange=:extrema) =
+Colorfier(values; alphas=defaultalphas(values), colorscheme=defaultscheme(values), colorrange=:extrema) =
   Colorfier(values, asalphas(alphas, values), ascolorscheme(colorscheme), colorrange)
 
 """
@@ -78,6 +78,13 @@ colorrange(colorfier::Colorfier) = colorfier.colorrange
 # ----
 # API
 # ----
+
+"""
+    Colorfy.defaultalphas(values)
+
+Default color alphas for `values`.
+"""
+defaultalphas(values) = fill(1, length(values))
 
 """
     Colorfy.defaultscheme(values)

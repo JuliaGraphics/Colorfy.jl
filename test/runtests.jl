@@ -2,6 +2,7 @@ using Colorfy
 using Colors
 using ColorSchemes
 using CategoricalArrays
+using Distributions
 using Unitful
 using Test
 
@@ -96,6 +97,19 @@ using Test
   @testset "CategoricalArrays" begin
     values = categorical(["n", "n", "y", "y", "n", "y"], levels=["y", "n"])
     colors = colorschemes[:viridis][[2, 2, 1, 1, 2, 1]]
+    @test colorfy(values) == coloralpha.(colors, 1)
+    @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
+  end
+
+  @testset "Distributions" begin
+    means = rand(10)
+    stds = rand(10)
+    values = Normal.(means, stds)
+    alphas = 1 .- (stds .- minimum(stds)) ./ (maximum(stds) - minimum(stds))
+    colors = colorfy(means)
+    @test colorfy(values) == coloralpha.(colors, alphas)
+    @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
+    values = Normal.(means, fill(0.5, 10))
     @test colorfy(values) == coloralpha.(colors, 1)
     @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
   end
