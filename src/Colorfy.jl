@@ -104,7 +104,7 @@ function colors(colorfier::Colorfier)
     # invalid values are assigned full transparency
     vcolors = Vector{Colorant}(undef, length(vals))
     vcolors[iinds] .= colorant"transparent"
-    
+
     # set colors of valid values
     vvals = coalesce.(vals[vinds])
     valphas = alphas(colorfier)[vinds]
