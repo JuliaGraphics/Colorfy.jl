@@ -87,13 +87,35 @@ defaultscheme(values) = colorschemes[:viridis]
 
 Colors mapped from the `colorfier` .
 """
-colors(colorfier::Colorfier) = coloralpha.(getcolors(colorfier), alphas(colorfier))
+function colors(colorfier::Colorfier)
+  # find invalid indices
+  isinvalid(v) = ismissing(v) || (v isa Number && !isfinite(v))
+  vals = values(colorfier)
+  iinds = findall(isinvalid, vals)
+
+  if isempty(iinds)
+    coloralpha.(getcolors(colorfier), alphas(colorfier))
+  else
+    # invalid values are assigned full transparency
+    vcolors = Vector{Colorant}(undef, length(vals))
+    vcolors[iinds] .= colorant"transparent"
+    
+    # set colors of valid values
+    vinds = setdiff(1:length(vals), iinds)
+    vvals = coalesce.(vals[vinds])
+    valphas = alphas(colorfier)[vinds]
+    vcolorfier = Colorfier(vvals, valphas, colorscheme(colorfier), colorrange(colorfier))
+    vcolors[vinds] .= colors(vcolorfier)
+
+    vcolors
+  end
+end
 
 """
-    Colorfy.getcolors(colorfier)
+    Colorfy.getcolors(colorfier, values)
 
 Function intended for developers that returns the mapped colors from the `colorfier` without the alphas. 
-Alphas are applied in the `get` function.
+Alphas are applied in the `Colorfy.colors` function.
 """
 getcolors(colorfier::Colorfier{<:Values{Number}}) =
   get(colorscheme(colorfier), values(colorfier), colorrange(colorfier))
