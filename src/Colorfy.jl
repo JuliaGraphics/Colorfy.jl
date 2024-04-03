@@ -44,6 +44,19 @@ See also [`Colorfier`](@ref), [`Colorfy.colors`](@ref).
 """
 colorfy(values; kwargs...) = colors(Colorfier(values; kwargs...))
 
+"""
+    Colorfy.update(colorfier; [values, alphas, colorscheme, colorrange])
+
+Constructs a new colorfier with `colorfier` fields and updated fields passed as keyword arguments.
+"""
+update(
+  colorfier::Colorfier;
+  values=values(colorfier),
+  alphas=alphas(colorfier),
+  colorscheme=colorscheme(colorfier),
+  colorrange=colorrange(colorfier)
+) = Colorfier(values; alphas, colorscheme, colorrange)
+
 # --------
 # GETTERS
 # --------
@@ -116,7 +129,7 @@ function colors(colorfier::Colorfier)
     # set colors of valid values
     vvals = coalesce.(vals[vinds])
     valphas = alphas(colorfier)[vinds]
-    vcolorfier = Colorfier(vvals, valphas, colorscheme(colorfier), colorrange(colorfier))
+    vcolorfier = update(colorfier, values=vvals, alphas=valphas)
     vcolors[vinds] .= colors(vcolorfier)
 
     vcolors
@@ -140,19 +153,13 @@ getcolors(colorfier::Colorfier{<:Values{Colorant}}) = values(colorfier)
 
 function getcolors(colorfier::Colorfier{<:Values{DateTime}})
   dvalues = datetime2unix.(values(colorfier))
-  dalphas = alphas(colorfier)
-  dcolorscheme = colorscheme(colorfier)
-  dcolorrange = colorrange(colorfier)
-  dcolorfier = Colorfier(dvalues, dalphas, dcolorscheme, dcolorrange)
+  dcolorfier = update(colorfier, values=dvalues)
   getcolors(dcolorfier)
 end
 
 function getcolors(colorfier::Colorfier{<:Values{Date}})
   dvalues = map(d -> datetime2unix(DateTime(d)), values(colorfier))
-  dalphas = alphas(colorfier)
-  dcolorscheme = colorscheme(colorfier)
-  dcolorrange = colorrange(colorfier)
-  dcolorfier = Colorfier(dvalues, dalphas, dcolorscheme, dcolorrange)
+  dcolorfier = update(colorfier, values=dvalues)
   getcolors(dcolorfier)
 end
 

@@ -10,10 +10,7 @@ using Unitful: Quantity, ustrip
 
 function Colorfy.getcolors(colorfier::Colorfier{<:Values{Quantity}})
   values = ustrip.(Colorfy.values(colorfier))
-  alphas = Colorfy.alphas(colorfier)
-  colorscheme = Colorfy.colorscheme(colorfier)
-  colorrange = Colorfy.colorrange(colorfier)
-  ucolorfier = Colorfier(values; alphas, colorscheme, colorrange)
+  ucolorfier = Colorfy.update(colorfier; values)
   Colorfy.getcolors(ucolorfier)
 end
 
