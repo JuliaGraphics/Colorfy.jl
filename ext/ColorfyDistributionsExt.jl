@@ -10,7 +10,7 @@ using Distributions: Distribution, location, scale
 
 function Colorfy.getcolors(colorfier::Colorfier{<:Values{Distribution}})
   values = location.(Colorfy.values(colorfier))
-  dcolorfier = Colorfier(colorfier; values)
+  dcolorfier = Colorfy.update(colorfier; values)
   Colorfy.getcolors(dcolorfier)
 end
 
