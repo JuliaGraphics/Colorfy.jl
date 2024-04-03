@@ -6,6 +6,7 @@ module ColorfyCategoricalArraysExt
 
 using Colorfy
 using Colorfy: Values
+using ColorSchemes: colorschemes
 using CategoricalArrays: CategoricalValue, levelcode
 
 function Colorfy.getcolors(colorfier::Colorfier{<:Values{CategoricalValue}})
@@ -13,5 +14,7 @@ function Colorfy.getcolors(colorfier::Colorfier{<:Values{CategoricalValue}})
   colorscheme = Colorfy.colorscheme(colorfier)
   colorscheme[levelcode.(values)]
 end
+
+Colorfy.defaultscheme(::Values{CategoricalValue}) = colorschemes[:Set3_9]
 
 end

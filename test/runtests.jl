@@ -96,7 +96,7 @@ using Test
 
   @testset "CategoricalArrays" begin
     values = categorical(["n", "n", "y", "y", "n", "y"], levels=["y", "n"])
-    colors = colorschemes[:viridis][[2, 2, 1, 1, 2, 1]]
+    colors = colorschemes[:Set3_9][[2, 2, 1, 1, 2, 1]]
     @test colorfy(values) == coloralpha.(colors, 1)
     @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
   end

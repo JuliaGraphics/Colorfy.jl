@@ -19,8 +19,8 @@ Maps each value in `values` to a color. Colors can be obtained using the [`Color
 
 ## Options
 
-* `alphas` - Scalar or a vector of color alphas (default to `fill(1, length(values))`);
-* `colorscheme` - Scheme name or a `ColorSchemes.ColorScheme` object (default to `defaultscheme(values)`);
+* `alphas` - Scalar or a vector of color alphas (default to `Colorfy.defaultalphas(values)`);
+* `colorscheme` - Scheme name or a `ColorSchemes.ColorScheme` object (default to `Colorfy.defaultscheme(values)`);
 * `colorrange` - Tuple with minimum and maximum color values or a symbol that can be passed 
   to the `rangescale` argument of the `ColorSchemes.get` function (default to `:extrema`);
 """
@@ -91,7 +91,7 @@ defaultalphas(values) = fill(1, length(values))
 
 Default color scheme for `values`.
 """
-defaultscheme(values) = colorschemes[:viridis]
+defaultscheme(_) = colorschemes[:viridis]
 
 """
     Colorfy.colors(colorfier)
