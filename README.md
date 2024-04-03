@@ -1,7 +1,7 @@
 # Colorfy.jl
 
-[![Build Status](https://github.com/eliascarv/Colorfy.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/eliascarv/Colorfy.jl/actions/workflows/CI.yml?query=branch%3Amain)
-[![Coverage](https://codecov.io/gh/eliascarv/Colorfy.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/eliascarv/Colorfy.jl)
+[![Build Status](https://github.com/JuliaGraphics/Colorfy.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JuliaGraphics/Colorfy.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Coverage](https://codecov.io/gh/JuliaGraphics/Colorfy.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JuliaGraphics/Colorfy.jl)
 
 Colorfy.jl is a package to map Julia objecets into colors defined by [Colors.jl](https://github.com/JuliaGraphics/Colors.jl).
 
