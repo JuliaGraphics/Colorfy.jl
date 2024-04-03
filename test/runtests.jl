@@ -1,6 +1,7 @@
 using Colorfy
 using Colors
 using ColorSchemes
+using CategoricalArrays
 using Unitful
 using Test
 
@@ -90,5 +91,12 @@ using Test
     @test colorfy(values) == colorfy(ustrip.(values))
     @test colorfy(values, alphas=0.5) == colorfy(ustrip.(values), alphas=0.5)
     @test colorfy(values, colorrange=(0.25, 0.75)) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
+  end
+
+  @testset "CategoricalArrays" begin
+    values = categorical(["n", "n", "y", "y", "n", "y"], levels=["y", "n"])
+    colors = colorschemes[:viridis][[2, 2, 1, 1, 2, 1]]
+    @test colorfy(values) == coloralpha.(colors, 1)
+    @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
   end
 end
