@@ -104,6 +104,8 @@ Default color alphas for `values`.
 """
 defaultalphas(values) = fill(1, length(values))
 
+defaultalphas(values::Values{Colorant}) = alpha.(values)
+
 """
     Colorfy.defaultcolorscheme(values)
 
