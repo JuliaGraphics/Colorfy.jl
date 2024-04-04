@@ -3,13 +3,13 @@
 [![Build Status](https://github.com/JuliaGraphics/Colorfy.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JuliaGraphics/Colorfy.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/JuliaGraphics/Colorfy.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JuliaGraphics/Colorfy.jl)
 
-Colorfy.jl is a package to map Julia objecets into colors defined by [Colors.jl](https://github.com/JuliaGraphics/Colors.jl).
+Colorfy.jl is a package for mapping Julia objects into colors defined by [Colors.jl](https://github.com/JuliaGraphics/Colors.jl).
 
 ## Usage
 
 The use of this package is centralized in the `Colorfier` struct.
 This type stores the necessary info to convert a list of values into a list of colors.
-To extract the colors mapped from colorfier, use the `Colorfy.colors` function:
+To extract the mapped colors from the colorfier, use the `Colorfy.colors` function:
 
 ```julia
 julia> values = rand(5)
@@ -42,7 +42,7 @@ julia> Colorfy.colors(colorfier)
 ```
 
 For convenience, the `colorfy` function is defined. This function
-creates a `Colorfier` instance and call the `Colorfy.colors` function:
+creates a `Colorfier` instance and calls the `Colorfy.colors` function:
 
 ```julia
 julia> values = [:red, :green, :blue];
