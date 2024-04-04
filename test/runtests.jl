@@ -65,9 +65,14 @@ using Test
     colorfier = Colorfier(values, alphas=0.5)
     @test Colorfy.colors(colorfier) == coloralpha.(colors, 0.5)
 
+    values = colors
     alphas = rand(5)
-    colorfier = Colorfier(colors; alphas)
+    colorfier = Colorfier(values; alphas)
     @test Colorfy.colors(colorfier) == coloralpha.(colors, alphas)
+
+    values = coloralpha.(colors, alphas)
+    colorfier = Colorfier(values)
+    @test Colorfy.colors(colorfier) == values
   end
 
   @testset "colorfy" begin
