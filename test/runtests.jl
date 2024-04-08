@@ -117,6 +117,12 @@ using Test
     colors = categcolors[[2, 1, 1, 3, 1, 3, 3, 2, 1, 2]]
     @test colorfy(values) == coloralpha.(colors, 1)
     @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
+
+    values = categorical([1, 1, 1, 1, 1], levels=[1])
+    categcolors = colorschemes[:viridis][range(0, 0, length=1)]
+    colors = categcolors[[1, 1, 1, 1, 1]]
+    @test colorfy(values) == coloralpha.(colors, 1)
+    @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
   end
 
   @testset "Distributions" begin
