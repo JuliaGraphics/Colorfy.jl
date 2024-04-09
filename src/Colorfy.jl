@@ -108,7 +108,7 @@ defaultalphas(values::Values) = fill(1, length(values))
 function defaultalphas(values::ValuesWithMissing)
   minds = findall(ismissing, values)
   vinds = setdiff(1:length(values), minds)
-  valphas = defaultalphas(coercevec(values[vinds]))
+  valphas = defaultalphas(nonmissingvec(values[vinds]))
   malpha = zero(eltype(valphas))
   genvec(vinds, valphas, minds, malpha, length(values))
 end
@@ -142,13 +142,13 @@ function colors(colorfier::Colorfier)
   vinds = setdiff(1:length(vals), iinds)
 
   if isempty(iinds)
-    # coercion is required to handle Vector{Union{Missing,T}} without missing values
-    vvals = coercevec(vals)
+    # required to handle Vector{Union{Missing,T}} without missing values
+    vvals = nonmissingvec(vals)
     vcolorfier = update(colorfier, values=vvals)
     coloralpha.(getcolors(vcolorfier), alphas(vcolorfier))
   else
     # get valid colors and set "transparent" for invalid values
-    vvals = coercevec(vals[vinds])
+    vvals = nonmissingvec(vals[vinds])
     valphas = alphas(colorfier)[vinds]
     vcolorfier = update(colorfier, values=vvals, alphas=valphas)
     vcolors = colors(vcolorfier)
@@ -200,7 +200,7 @@ function asalphas(alphas::AbstractVector, values)
   alphas
 end
 
-coercevec(x::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, x)
+nonmissingvec(x::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, x)
 
 function genvec(vecinds, vec, valinds, val, len)
   dict = Dict(i => val for i in valinds)
