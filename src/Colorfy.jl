@@ -106,12 +106,11 @@ Default color alphas for `values`.
 defaultalphas(values::Values) = fill(1, length(values))
 
 function defaultalphas(values::ValuesWithMissing)
-  vals = Vector{Float64}(undef, length(values))
   minds = findall(ismissing, values)
   vinds = setdiff(1:length(values), minds)
-  vals[minds] .= 0.0
-  vals[vinds] .= defaultalphas(coalesce.(values[vinds]))
-  vals
+  valphas = defaultalphas(nonmissingvec(values[vinds]))
+  malpha = zero(eltype(valphas))
+  genvec(vinds, valphas, minds, malpha, length(values))
 end
 
 defaultalphas(values::Values{Colorant}) = alpha.(values)
@@ -143,19 +142,18 @@ function colors(colorfier::Colorfier)
   vinds = setdiff(1:length(vals), iinds)
 
   if isempty(iinds)
-    coloralpha.(getcolors(colorfier), alphas(colorfier))
+    # required to handle Vector{Union{Missing,T}} without missing values
+    vvals = nonmissingvec(vals)
+    vcolorfier = update(colorfier, values=vvals)
+    coloralpha.(getcolors(vcolorfier), alphas(vcolorfier))
   else
-    # invalid values are assigned full transparency
-    vcolors = Vector{Colorant}(undef, length(vals))
-    vcolors[iinds] .= colorant"transparent"
-
-    # set colors of valid values
-    vvals = coalesce.(vals[vinds])
+    # get valid colors and set "transparent" for invalid values
+    vvals = nonmissingvec(vals[vinds])
     valphas = alphas(colorfier)[vinds]
     vcolorfier = update(colorfier, values=vvals, alphas=valphas)
-    vcolors[vinds] .= colors(vcolorfier)
-
-    vcolors
+    vcolors = colors(vcolorfier)
+    icolor = colorant"transparent"
+    genvec(vinds, vcolors, iinds, icolor, length(vals))
   end
 end
 
@@ -200,6 +198,14 @@ function asalphas(alphas::AbstractVector, values)
     throw(ArgumentError("the number of alphas must be equal to the number of values"))
   end
   alphas
+end
+
+nonmissingvec(x::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, x)
+
+function genvec(vecinds, vec, valinds, val, len)
+  valdict = Dict(i => val for i in valinds)
+  merge!(valdict, Dict(zip(vecinds, vec)))
+  [valdict[i] for i in 1:len]
 end
 
 end

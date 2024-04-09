@@ -91,6 +91,10 @@ using Test
     @test colors[4] == colorant"transparent"
     @test colors[6] == colorant"transparent"
     @test colors[8] == colorant"transparent"
+
+    # Vector{Union{Missing,T}} whitout missing values
+    values = Union{Missing,Int}[1, 2, 3, 4, 5]
+    @test colorfy(values) == colorfy([1, 2, 3, 4, 5])
   end
 
   @testset "Dates" begin
