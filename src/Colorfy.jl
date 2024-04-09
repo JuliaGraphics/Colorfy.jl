@@ -142,11 +142,12 @@ function colors(colorfier::Colorfier)
   vinds = setdiff(1:length(vals), iinds)
 
   if isempty(iinds)
-    # handle Vector{Union{Missing,T}} whitout missing values
+    # coercion is required to handle Vector{Union{Missing,T}} without missing values
     vvals = coercevec(vals)
     vcolorfier = update(colorfier, values=vvals)
     coloralpha.(getcolors(vcolorfier), alphas(vcolorfier))
   else
+    # get valid colors and set "transparent" for invalid values
     vvals = coercevec(vals[vinds])
     valphas = alphas(colorfier)[vinds]
     vcolorfier = update(colorfier, values=vvals, alphas=valphas)
