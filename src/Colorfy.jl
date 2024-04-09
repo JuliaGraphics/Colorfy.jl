@@ -203,9 +203,9 @@ end
 nonmissingvec(x::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, x)
 
 function genvec(vecinds, vec, valinds, val, len)
-  dict = Dict(i => val for i in valinds)
-  merge!(dict, Dict(zip(vecinds, vec)))
-  [dict[i] for i in 1:len]
+  valdict = Dict(i => val for i in valinds)
+  merge!(valdict, Dict(zip(vecinds, vec)))
+  [valdict[i] for i in 1:len]
 end
 
 end
