@@ -163,6 +163,13 @@ end
 Function intended for developers that returns the mapped colors from the `colorfier` without the alphas. 
 Alphas are applied in the `Colorfy.colors` function.
 """
+function getcolors(colorfier::Colorfier)
+  throw(ArgumentError("""
+  Values of type `$(eltype(colorfier.values))` are not supported.
+  Please make sure your vector of colors has the right type.
+  """))
+end
+
 getcolors(colorfier::Colorfier{<:Values{Number}}) =
   get(colorscheme(colorfier), values(colorfier), colorrange(colorfier))
 
