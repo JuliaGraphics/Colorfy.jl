@@ -12,7 +12,6 @@ export Colorfier, colorfy
 
 # type alias to reduce typing
 const Values{T} = AbstractVector{<:T}
-const ValuesWithMissing{T} = AbstractVector{Union{Missing,T}}
 
 """
     Colorfier(values; [alphas, colorscheme, colorrange])
@@ -103,14 +102,17 @@ colorrange(colorfier::Colorfier) = colorfier.colorrange
 
 Default color alphas for `values`.
 """
-defaultalphas(values::Values) = fill(1, length(values))
-
-function defaultalphas(values::ValuesWithMissing)
+function defaultalphas(values::Values)
   minds = findall(ismissing, values)
   vinds = setdiff(1:length(values), minds)
-  valphas = defaultalphas(nonmissingvec(values[vinds]))
-  malpha = zero(eltype(valphas))
-  genvec(vinds, valphas, minds, malpha, length(values))
+
+  if isempty(minds)
+    fill(1, length(values))
+  else
+    valphas = defaultalphas(nonmissingvec(values[vinds]))
+    malpha = zero(eltype(valphas))
+    genvec(vinds, valphas, minds, malpha, length(values))
+  end
 end
 
 defaultalphas(values::Values{Colorant}) = alpha.(values)

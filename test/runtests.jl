@@ -79,8 +79,7 @@ using Test
     colorfier = Colorfier(values)
     @test_throws ArgumentError Colorfy.colors(colorfier)
     values = Any[:red, :green, :blue] # vector with non-concrete eltype
-    alphas = rand(3)
-    colorfier = Colorfier(values; alphas)
+    colorfier = Colorfier(values)
     @test_throws ArgumentError Colorfy.colors(colorfier)
   end
 
