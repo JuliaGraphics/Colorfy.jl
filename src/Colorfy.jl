@@ -166,7 +166,7 @@ Alphas are applied in the `Colorfy.colors` function.
 function getcolors(colorfier::Colorfier)
   throw(ArgumentError("""
   Values of type `$(eltype(colorfier.values))` are not supported.
-  Please make sure your vector of colors has the right type.
+  Please make sure your vector of colors has a concrete type.
   """))
 end
 
