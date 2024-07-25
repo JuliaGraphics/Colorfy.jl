@@ -73,6 +73,15 @@ using Test
     values = coloralpha.(colors, alphas)
     colorfier = Colorfier(values)
     @test Colorfy.colors(colorfier) == values
+
+    # error: unsupported values
+    values = [nothing, nothing, nothing]
+    colorfier = Colorfier(values)
+    @test_throws ArgumentError Colorfy.colors(colorfier)
+    values = Any[:red, :green, :blue] # vector with non-concrete eltype
+    alphas = rand(3)
+    colorfier = Colorfier(values; alphas)
+    @test_throws ArgumentError Colorfy.colors(colorfier)
   end
 
   @testset "colorfy" begin
