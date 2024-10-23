@@ -21,7 +21,7 @@ ColorfyUnitfulExt = "Unitful"
 [compat]
 CategoricalArrays = "0.10"
 ColorSchemes = "3.24"
-Colors = "0.12"
+Colors = "0.12, 0.13"
 Dates = "1.9"
 Distributions = "0.25"
 Unitful = "1.19"
