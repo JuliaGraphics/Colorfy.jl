@@ -34,6 +34,18 @@ using Test
     @test Colorfy.colorscheme(colorfier) == colorschemes[:grays]
     @test Colorfy.colorrange(colorfier) == :extrema
 
+    colorfier = Colorfier(values, colorrange=(0.25, 0.75))
+    @test Colorfy.values(colorfier) == values
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == (0.25, 0.75)
+
+    colorfier = Colorfier(values, colorrange=(0, 0.5))
+    @test Colorfy.values(colorfier) == values
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == (0.0, 0.5)
+
     alphas = rand(10)
     colorfier = Colorfier(values; alphas, colorscheme=colorschemes[:grays], colorrange=(0.25, 0.75))
     @test Colorfy.values(colorfier) == values
@@ -163,5 +175,6 @@ using Test
     @test colorfy(values) == colorfy(ustrip.(values))
     @test colorfy(values, alphas=0.5) == colorfy(ustrip.(values), alphas=0.5)
     @test colorfy(values, colorrange=(0.25, 0.75)) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
+    @test colorfy(values, colorrange=(0.25u"m", 0.75u"m")) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
   end
 end

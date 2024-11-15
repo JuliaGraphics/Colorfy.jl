@@ -14,4 +14,6 @@ function Colorfy.getcolors(colorfier::Colorfier{<:Values{Quantity}})
   Colorfy.getcolors(ucolorfier)
 end
 
+Colorfy.ascolorrange(colorrange::NTuple{2,Quantity}) = Colorfy.ascolorrange(ustrip.(colorrange))
+
 end

@@ -37,7 +37,7 @@ Colorfier(
   alphas=defaultalphas(values),
   colorscheme=defaultcolorscheme(values),
   colorrange=defaultcolorrange(values)
-) = Colorfier(values, asalphas(alphas, values), ascolorscheme(colorscheme), colorrange)
+) = Colorfier(values, asalphas(alphas, values), ascolorscheme(colorscheme), ascolorrange(colorrange))
 
 """
     colorfy(values; kwargs...)
@@ -132,6 +132,37 @@ Default color range for `values`.
 defaultcolorrange(_) = :extrema
 
 """
+    Colorfy.asalphas(alphas, values)
+
+Valid color alphas for a given `alphas` and `values`.
+"""
+asalphas(alpha, values) = fill(alpha, length(values))
+function asalphas(alphas::AbstractVector, values)
+  if length(alphas) ≠ length(values)
+    throw(ArgumentError("the number of alphas must be equal to the number of values"))
+  end
+  alphas
+end
+
+"""
+    Colorfy.ascolorscheme(colorscheme)
+
+Valid `ColorScheme` object for a given `colorscheme`.
+"""
+ascolorscheme(colorscheme::Symbol) = colorschemes[colorscheme]
+ascolorscheme(colorscheme::AbstractString) = ascolorscheme(Symbol(colorscheme))
+ascolorscheme(colorscheme::ColorScheme) = colorscheme
+
+"""
+    Colorfy.ascolorrange(colorrange)
+
+Valid color range, accepted by the `ColorSchemes.get` function, for a given `colorrange`.
+"""
+ascolorrange(colorrange::Symbol) = colorrange
+ascolorrange(colorrange::NTuple{2,T}) where {T<:Real} = colorrange
+ascolorrange(colorrange::NTuple{2,Real}) = promote(colorrange...)
+
+"""
     Colorfy.colors(colorfier)
 
 Colors mapped from the `colorfier` .
@@ -196,18 +227,6 @@ end
 # -----------------
 # HELPER FUNCTIONS
 # -----------------
-
-ascolorscheme(name::Symbol) = colorschemes[name]
-ascolorscheme(name::AbstractString) = ascolorscheme(Symbol(name))
-ascolorscheme(scheme::ColorScheme) = scheme
-
-asalphas(alpha, values) = fill(alpha, length(values))
-function asalphas(alphas::AbstractVector, values)
-  if length(alphas) ≠ length(values)
-    throw(ArgumentError("the number of alphas must be equal to the number of values"))
-  end
-  alphas
-end
 
 nonmissingvec(x::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, x)
 
