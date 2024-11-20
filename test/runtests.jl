@@ -1,6 +1,7 @@
 using Colorfy
 using Colors
 using ColorSchemes
+using FixedPointNumbers
 using CategoricalArrays
 using Distributions
 using Unitful
@@ -12,6 +13,24 @@ using Test
     values = rand(10)
     colorfier = Colorfier(values)
     @test Colorfy.values(colorfier) == values
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == :extrema
+
+    colors = [Gray(rand()) for _ in 1:10]
+    colorfier = Colorfier(colors)
+    @test eltype(Colorfy.values(colorfier)) <: Gray
+    @test eltype(eltype(Colorfy.values(colorfier))) <: AbstractFloat
+    @test Colorfy.values(colorfier) == colors
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == :extrema
+
+    colors = [Gray(rand(Q0f15)) for _ in 1:10]
+    colorfier = Colorfier(colors)
+    @test eltype(Colorfy.values(colorfier)) <: Gray
+    @test eltype(eltype(Colorfy.values(colorfier))) <: AbstractFloat
+    @test Colorfy.values(colorfier) == colors
     @test Colorfy.alphas(colorfier) == fill(1, 10)
     @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
     @test Colorfy.colorrange(colorfier) == :extrema
@@ -68,8 +87,8 @@ using Test
     colors = get(colorschemes[:grays], values, (0.25, 0.75))
     @test Colorfy.colors(colorfier) == coloralpha.(colors, 1)
 
-    colors = [colorant"red", colorant"green", colorant"blue", colorant"white", colorant"black"]
     values = ["red", "green", "blue", "white", "black"]
+    colors = parse.(Colorant{Float32}, values)
     colorfier = Colorfier(values)
     @test Colorfy.colors(colorfier) == coloralpha.(colors, 1)
 
@@ -85,6 +104,23 @@ using Test
     values = coloralpha.(colors, alphas)
     colorfier = Colorfier(values)
     @test Colorfy.colors(colorfier) == values
+
+    # Colorfy.colors always return float colors
+    values = rand(10)
+    colorfier = Colorfier(values)
+    ccolors = Colorfy.colors(colorfier)
+    @test eltype(ccolors) <: Colorant
+    @test eltype(eltype(ccolors)) <: AbstractFloat
+    values = ["red", "green", "blue", "white", "black"]
+    colorfier = Colorfier(values)
+    ccolors = Colorfy.colors(colorfier)
+    @test eltype(ccolors) <: Colorant
+    @test eltype(eltype(ccolors)) <: AbstractFloat
+    values = [:red, :green, :blue, :white, :black]
+    colorfier = Colorfier(values)
+    ccolors = Colorfy.colors(colorfier)
+    @test eltype(ccolors) <: Colorant
+    @test eltype(eltype(ccolors)) <: AbstractFloat
 
     # error: unsupported values
     values = [nothing, nothing, nothing]

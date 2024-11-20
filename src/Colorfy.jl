@@ -6,6 +6,7 @@ module Colorfy
 
 using Colors
 using ColorSchemes
+using FixedPointNumbers
 using Dates
 
 export Colorfier, colorfy
@@ -32,12 +33,13 @@ struct Colorfier{V,A,S,R}
   colorrange::R
 end
 
-Colorfier(
-  values;
-  alphas=defaultalphas(values),
-  colorscheme=defaultcolorscheme(values),
-  colorrange=defaultcolorrange(values)
-) = Colorfier(values, asalphas(alphas, values), ascolorscheme(colorscheme), ascolorrange(colorrange))
+function Colorfier(values; alphas=nothing, colorscheme=nothing, colorrange=nothing)
+  values′ = asvalues(values)
+  alphas′ = isnothing(alphas) ? defaultalphas(values′) : alphas
+  colorscheme′ = isnothing(colorscheme) ? defaultcolorscheme(values′) : colorscheme
+  colorrange′ = isnothing(colorrange) ? defaultcolorrange(values′) : colorrange
+  Colorfier(values′, asalphas(alphas′, values′), ascolorscheme(colorscheme′), ascolorrange(colorrange′))
+end
 
 """
     colorfy(values; kwargs...)
@@ -132,6 +134,14 @@ Default color range for `values`.
 defaultcolorrange(_) = :extrema
 
 """
+    Colorfy.asvalues(values)
+
+Valid color values for a given `values`.
+"""
+asvalues(values) = values
+asvalues(values::Values{Colorant}) = floatcolors(values)
+
+"""
     Colorfy.asalphas(alphas, values)
 
 Valid color alphas for a given `alphas` and `values`.
@@ -178,7 +188,8 @@ function colors(colorfier::Colorfier)
     # required to handle Vector{Union{Missing,T}} without missing values
     vvals = nonmissingvec(vals)
     vcolorfier = update(colorfier, values=vvals)
-    coloralpha.(getcolors(vcolorfier), alphas(vcolorfier))
+    vcolors = floatcolors(getcolors(vcolorfier))
+    coloralpha.(vcolors, alphas(colorfier))
   else
     # get valid colors and set "transparent" for invalid values
     vvals = nonmissingvec(vals[vinds])
@@ -227,6 +238,9 @@ end
 # -----------------
 # HELPER FUNCTIONS
 # -----------------
+
+floatcolors(colors::Values{Colorant{<:AbstractFloat}}) = colors
+floatcolors(colors::Values{Colorant{<:FixedPoint}}) = convert.(floattype(eltype(colors)), colors)
 
 nonmissingvec(x::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, x)
 
