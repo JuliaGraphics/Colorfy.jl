@@ -139,7 +139,11 @@ defaultcolorrange(_) = :extrema
 Valid color values for a given `values`.
 """
 asvalues(values) = values
-asvalues(values::Values{Colorant}) = floatcolors(values)
+asvalues(values::Values{Colorant}) = values
+asvalues(values::Values{Colorant{Q0f7}}) = fixcolors(values)
+asvalues(values::Values{Colorant{Q0f15}}) = fixcolors(values)
+asvalues(values::Values{Colorant{Q0f31}}) = fixcolors(values)
+asvalues(values::Values{Colorant{Q0f63}}) = fixcolors(values)
 
 """
     Colorfy.asalphas(alphas, values)
@@ -188,8 +192,7 @@ function colors(colorfier::Colorfier)
     # required to handle Vector{Union{Missing,T}} without missing values
     vvals = nonmissingvec(vals)
     vcolorfier = update(colorfier, values=vvals)
-    vcolors = floatcolors(getcolors(vcolorfier))
-    coloralpha.(vcolors, alphas(colorfier))
+    coloralpha.(getcolors(vcolorfier), alphas(vcolorfier))
   else
     # get valid colors and set "transparent" for invalid values
     vvals = nonmissingvec(vals[vinds])
@@ -239,8 +242,7 @@ end
 # HELPER FUNCTIONS
 # -----------------
 
-floatcolors(colors::Values{Colorant{<:AbstractFloat}}) = colors
-floatcolors(colors::Values{Colorant{<:FixedPoint}}) = convert.(floattype(eltype(colors)), colors)
+fixcolors(colors) = convert.(floattype(eltype(colors)), colors)
 
 nonmissingvec(x::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, x)
 
