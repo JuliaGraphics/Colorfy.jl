@@ -1,6 +1,7 @@
 using Colorfy
 using Colors
 using ColorSchemes
+using FixedPointNumbers
 using CategoricalArrays
 using Distributions
 using Unitful
@@ -12,6 +13,51 @@ using Test
     values = rand(10)
     colorfier = Colorfier(values)
     @test Colorfy.values(colorfier) == values
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == :extrema
+
+    colors = [Gray(rand()) for _ in 1:10]
+    colorfier = Colorfier(colors)
+    @test eltype(Colorfy.values(colorfier)) <: Gray
+    @test eltype(eltype(Colorfy.values(colorfier))) <: AbstractFloat
+    @test Colorfy.values(colorfier) == colors
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == :extrema
+
+    colors = [Gray(rand(Q0f7)) for _ in 1:10]
+    colorfier = Colorfier(colors)
+    @test eltype(Colorfy.values(colorfier)) <: Gray
+    @test eltype(eltype(Colorfy.values(colorfier))) <: AbstractFloat
+    @test Colorfy.values(colorfier) == colors
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == :extrema
+
+    colors = [Gray(rand(Q0f15)) for _ in 1:10]
+    colorfier = Colorfier(colors)
+    @test eltype(Colorfy.values(colorfier)) <: Gray
+    @test eltype(eltype(Colorfy.values(colorfier))) <: AbstractFloat
+    @test Colorfy.values(colorfier) == colors
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == :extrema
+
+    colors = [Gray(rand(Q0f31)) for _ in 1:10]
+    colorfier = Colorfier(colors)
+    @test eltype(Colorfy.values(colorfier)) <: Gray
+    @test eltype(eltype(Colorfy.values(colorfier))) <: AbstractFloat
+    @test Colorfy.values(colorfier) == colors
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
+    @test Colorfy.colorrange(colorfier) == :extrema
+
+    colors = [Gray(rand(Q0f63)) for _ in 1:10]
+    colorfier = Colorfier(colors)
+    @test eltype(Colorfy.values(colorfier)) <: Gray
+    @test eltype(eltype(Colorfy.values(colorfier))) <: AbstractFloat
+    @test Colorfy.values(colorfier) == colors
     @test Colorfy.alphas(colorfier) == fill(1, 10)
     @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
     @test Colorfy.colorrange(colorfier) == :extrema

@@ -6,6 +6,7 @@ module Colorfy
 
 using Colors
 using ColorSchemes
+using FixedPointNumbers
 using Dates
 
 export Colorfier, colorfy
@@ -32,12 +33,13 @@ struct Colorfier{V,A,S,R}
   colorrange::R
 end
 
-Colorfier(
-  values;
-  alphas=defaultalphas(values),
-  colorscheme=defaultcolorscheme(values),
-  colorrange=defaultcolorrange(values)
-) = Colorfier(values, asalphas(alphas, values), ascolorscheme(colorscheme), ascolorrange(colorrange))
+function Colorfier(values; alphas=nothing, colorscheme=nothing, colorrange=nothing)
+  values′ = asvalues(values)
+  alphas′ = isnothing(alphas) ? defaultalphas(values′) : alphas
+  colorscheme′ = isnothing(colorscheme) ? defaultcolorscheme(values′) : colorscheme
+  colorrange′ = isnothing(colorrange) ? defaultcolorrange(values′) : colorrange
+  Colorfier(values′, asalphas(alphas′, values′), ascolorscheme(colorscheme′), ascolorrange(colorrange′))
+end
 
 """
     colorfy(values; kwargs...)
@@ -130,6 +132,18 @@ defaultcolorscheme(_) = colorschemes[:viridis]
 Default color range for `values`.
 """
 defaultcolorrange(_) = :extrema
+
+"""
+    Colorfy.asvalues(values)
+
+Valid color values for a given `values`.
+"""
+asvalues(values) = values
+asvalues(values::Values{Colorant}) = values
+asvalues(values::Values{Colorant{Q0f7}}) = fixcolors(values)
+asvalues(values::Values{Colorant{Q0f15}}) = fixcolors(values)
+asvalues(values::Values{Colorant{Q0f31}}) = fixcolors(values)
+asvalues(values::Values{Colorant{Q0f63}}) = fixcolors(values)
 
 """
     Colorfy.asalphas(alphas, values)
@@ -227,6 +241,8 @@ end
 # -----------------
 # HELPER FUNCTIONS
 # -----------------
+
+fixcolors(colors) = convert.(floattype(eltype(colors)), colors)
 
 nonmissingvec(x::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, x)
 
