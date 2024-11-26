@@ -107,15 +107,13 @@ function defaultalphas(values::Values)
   vinds = setdiff(1:length(values), minds)
 
   if isempty(minds)
-    fill(1, length(values))
+    fill(nothing, length(values))
   else
     valphas = defaultalphas(nonmissingvec(values[vinds]))
-    malpha = zero(eltype(valphas))
+    malpha = nothing
     genvec(vinds, valphas, minds, malpha, length(values))
   end
 end
-
-defaultalphas(values::Values{Colorant}) = alpha.(values)
 
 """
     Colorfy.defaultcolorscheme(values)
@@ -178,7 +176,7 @@ function colors(colorfier::Colorfier)
     # required to handle Vector{Union{Missing,T}} without missing values
     vvals = nonmissingvec(vals)
     vcolorfier = update(colorfier, values=vvals)
-    coloralpha.(getcolors(vcolorfier), alphas(vcolorfier))
+    setalpha.(getcolors(vcolorfier), alphas(vcolorfier))
   else
     # get valid colors and set "transparent" for invalid values
     vvals = nonmissingvec(vals[vinds])
@@ -228,12 +226,15 @@ end
 # HELPER FUNCTIONS
 # -----------------
 
+setalpha(color, alpha) = coloralpha(color, alpha)
+setalpha(color, ::Nothing) = color
+
 nonmissingvec(x::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, x)
 
 function genvec(vecinds, vec, valinds, val, len)
   valdict = Dict(i => val for i in valinds)
-  merge!(valdict, Dict(zip(vecinds, vec)))
-  [valdict[i] for i in 1:len]
+  dict = merge(valdict, Dict(zip(vecinds, vec)))
+  [dict[i] for i in 1:len]
 end
 
 end

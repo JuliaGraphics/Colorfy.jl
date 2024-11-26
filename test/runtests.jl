@@ -1,6 +1,7 @@
 using Colorfy
 using Colors
 using ColorSchemes
+using FixedPointNumbers
 using CategoricalArrays
 using Distributions
 using Unitful
@@ -12,7 +13,7 @@ using Test
     values = rand(10)
     colorfier = Colorfier(values)
     @test Colorfy.values(colorfier) == values
-    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.alphas(colorfier) == fill(nothing, 10)
     @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
     @test Colorfy.colorrange(colorfier) == :extrema
 
@@ -24,25 +25,25 @@ using Test
 
     colorfier = Colorfier(values, colorscheme=:grays)
     @test Colorfy.values(colorfier) == values
-    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.alphas(colorfier) == fill(nothing, 10)
     @test Colorfy.colorscheme(colorfier) == colorschemes[:grays]
     @test Colorfy.colorrange(colorfier) == :extrema
 
     colorfier = Colorfier(values, colorscheme="grays")
     @test Colorfy.values(colorfier) == values
-    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.alphas(colorfier) == fill(nothing, 10)
     @test Colorfy.colorscheme(colorfier) == colorschemes[:grays]
     @test Colorfy.colorrange(colorfier) == :extrema
 
     colorfier = Colorfier(values, colorrange=(0.25, 0.75))
     @test Colorfy.values(colorfier) == values
-    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.alphas(colorfier) == fill(nothing, 10)
     @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
     @test Colorfy.colorrange(colorfier) == (0.25, 0.75)
 
     colorfier = Colorfier(values, colorrange=(0, 0.5))
     @test Colorfy.values(colorfier) == values
-    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.alphas(colorfier) == fill(nothing, 10)
     @test Colorfy.colorscheme(colorfier) == colorschemes[:viridis]
     @test Colorfy.colorrange(colorfier) == (0.0, 0.5)
 
@@ -62,16 +63,16 @@ using Test
     values = rand(10)
     colorfier = Colorfier(values)
     colors = get(colorschemes[:viridis], values, :extrema)
-    @test Colorfy.colors(colorfier) == coloralpha.(colors, 1)
+    @test Colorfy.colors(colorfier) == colors
 
     colorfier = Colorfier(values, colorscheme=:grays, colorrange=(0.25, 0.75))
     colors = get(colorschemes[:grays], values, (0.25, 0.75))
-    @test Colorfy.colors(colorfier) == coloralpha.(colors, 1)
+    @test Colorfy.colors(colorfier) == colors
 
     colors = [colorant"red", colorant"green", colorant"blue", colorant"white", colorant"black"]
     values = ["red", "green", "blue", "white", "black"]
     colorfier = Colorfier(values)
-    @test Colorfy.colors(colorfier) == coloralpha.(colors, 1)
+    @test Colorfy.colors(colorfier) == colors
 
     values = [:red, :green, :blue, :white, :black]
     colorfier = Colorfier(values, alphas=0.5)
@@ -83,6 +84,22 @@ using Test
     @test Colorfy.colors(colorfier) == coloralpha.(colors, alphas)
 
     values = coloralpha.(colors, alphas)
+    colorfier = Colorfier(values)
+    @test Colorfy.colors(colorfier) == values
+
+    values = [Gray(rand(Q0f7)) for _ in 1:10]
+    colorfier = Colorfier(values)
+    @test Colorfy.colors(colorfier) == values
+
+    values = [Gray(rand(Q0f15)) for _ in 1:10]
+    colorfier = Colorfier(values)
+    @test Colorfy.colors(colorfier) == values
+
+    values = [Gray(rand(Q0f31)) for _ in 1:10]
+    colorfier = Colorfier(values)
+    @test Colorfy.colors(colorfier) == values
+
+    values = [Gray(rand(Q0f63)) for _ in 1:10]
     colorfier = Colorfier(values)
     @test Colorfy.colors(colorfier) == values
 
@@ -98,10 +115,10 @@ using Test
   @testset "colorfy" begin
     values = rand(10)
     colors = get(colorschemes[:viridis], values, :extrema)
-    @test colorfy(values) == coloralpha.(colors, 1)
+    @test colorfy(values) == colors
 
     colors = get(colorschemes[:grays], values, (0.25, 0.75))
-    @test colorfy(values, colorscheme=:grays, colorrange=(0.25, 0.75)) == coloralpha.(colors, 1)
+    @test colorfy(values, colorscheme=:grays, colorrange=(0.25, 0.75)) == colors
   end
 
   @testset "Invalid values" begin
@@ -133,19 +150,19 @@ using Test
     values = categorical(["n", "n", "y", "y", "n", "y"], levels=["y", "n"])
     categcolors = colorschemes[:viridis][range(0, 1, length=2)]
     colors = categcolors[[2, 2, 1, 1, 2, 1]]
-    @test colorfy(values) == coloralpha.(colors, 1)
+    @test colorfy(values) == colors
     @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
 
     values = categorical([2, 1, 1, 3, 1, 3, 3, 2, 1, 2], levels=1:3)
     categcolors = colorschemes[:viridis][range(0, 1, length=3)]
     colors = categcolors[[2, 1, 1, 3, 1, 3, 3, 2, 1, 2]]
-    @test colorfy(values) == coloralpha.(colors, 1)
+    @test colorfy(values) == colors
     @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
 
     values = categorical([1, 1, 1, 1, 1], levels=[1])
     categcolors = colorschemes[:viridis][range(0, 0, length=1)]
     colors = categcolors[[1, 1, 1, 1, 1]]
-    @test colorfy(values) == coloralpha.(colors, 1)
+    @test colorfy(values) == colors
     @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
   end
 
