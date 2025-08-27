@@ -1,7 +1,7 @@
 name = "Colorfy"
 uuid = "03fe91ce-8ec6-4610-8e8d-e7491ccca690"
 authors = ["Elias Carvalho <eliascarvdev@gmail.com> and contributors"]
-version = "1.1.1"
+version = "1.1.2"
 
 [deps]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
@@ -20,7 +20,7 @@ ColorfyDistributionsExt = "Distributions"
 ColorfyUnitfulExt = "Unitful"
 
 [compat]
-CategoricalArrays = "0.10, 1.0"
+CategoricalArrays = "1.0"
 ColorSchemes = "3.24"
 Colors = "0.12, 0.13"
 Dates = "1.9"
