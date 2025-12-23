@@ -22,7 +22,7 @@ Maps each value in `values` to a color. Colors can be obtained using the [`Color
 ## Options
 
 * `alphas` - Scalar or a vector of color alphas (default to `Colorfy.defaultalphas(values)`);
-* `colorscheme` - Scheme name or a `ColorSchemes.ColorScheme` object (default to `Colorfy.defaultcolorscheme(values)`);
+* `colorscheme` - Color scheme specification (default to `Colorfy.defaultcolorscheme(values)`);
 * `colorrange` - Tuple with minimum and maximum color values or a symbol that can be passed 
   to the `rangescale` argument of the `ColorSchemes.get` function (default to `Colorfy.defaultcolorrange(values)`);
 """
@@ -161,10 +161,11 @@ end
 """
     Colorfy.ascolorscheme(colorscheme)
 
-Valid `ColorScheme` object for a given `colorscheme`.
+Valid `ColorScheme` object for a given `colorscheme` specification.
 """
 ascolorscheme(colorscheme::Symbol) = colorschemes[colorscheme]
 ascolorscheme(colorscheme::AbstractString) = ascolorscheme(Symbol(colorscheme))
+ascolorscheme(colorscheme::AbstractVector) = ColorScheme([parse(Colorant, color) for color in colorscheme])
 ascolorscheme(colorscheme::ColorScheme) = colorscheme
 
 """

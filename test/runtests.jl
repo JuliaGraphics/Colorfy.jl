@@ -80,6 +80,13 @@ using Test
     @test Colorfy.colorscheme(colorfier) == colorschemes[:grays]
     @test Colorfy.colorrange(colorfier) == :extrema
 
+    colorfier = Colorfier(values, colorscheme=["black", "white"])
+    @test Colorfy.values(colorfier) == values
+    @test Colorfy.alphas(colorfier) == fill(1, 10)
+    @test Colorfy.colorscheme(colorfier)[0.0] == colorant"black"
+    @test Colorfy.colorscheme(colorfier)[1.0] == colorant"white"
+    @test Colorfy.colorrange(colorfier) == :extrema
+
     colorfier = Colorfier(values, colorrange=(0.25, 0.75))
     @test Colorfy.values(colorfier) == values
     @test Colorfy.alphas(colorfier) == fill(1, 10)
