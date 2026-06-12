@@ -14,9 +14,9 @@ function Colorfy.repr(values::AbstractVector{<:Distribution}, colorscheme, color
   # extract location and scale parameters
   μs = location.(values)
   σs = scale.(values)
-  a, b = extrema(σs)
 
   # compute alphas based on scale parameters
+  a, b = extrema(σs)
   αs = if a == b
     fill(1, length(μs))
   else
