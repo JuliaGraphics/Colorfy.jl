@@ -4,18 +4,15 @@
 
 module ColorfyCategoricalArraysExt
 
-using Colorfy
-using Colorfy: Values
-using ColorSchemes: colorschemes
-using CategoricalArrays: CategoricalValue, levels, levelcode
+using CategoricalArrays: CategoricalValue
+using CategoricalArrays: levels, levelcode
 
-function Colorfy.getcolors(colorfier::Colorfier{<:Values{CategoricalValue}})
-  values = Colorfy.values(colorfier)
-  colorscheme = Colorfy.colorscheme(colorfier)
+import Colorfy
+
+function Colorfy.repr(values::AbstractVector{<:CategoricalValue}, colorscheme, colorrange)
   nlevels = length(levels(values))
-  categcolors = colorscheme[range(0, nlevels > 1 ? 1 : 0, length=nlevels)]
-  colors = categcolors[levelcode.(values)]
-  coloralpha.(colors, alphas(colorfier))
+  lcolors = colorscheme[range(0, nlevels > 1 ? 1 : 0, length=nlevels)]
+  lcolors[levelcode.(values)]
 end
 
 end

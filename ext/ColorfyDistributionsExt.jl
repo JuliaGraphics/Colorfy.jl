@@ -4,28 +4,25 @@
 
 module ColorfyDistributionsExt
 
-using Colorfy
-using Colorfy: Values
-using Distributions: Distribution, location, scale
+using Distributions: Distribution
+using Distributions: location, scale
 
-function Colorfy.getcolors(colorfier::Colorfier{<:Values{Distribution}})
+import Colorfy
+
+function Colorfy.repr(values::AbstractVector{<:Distribution}, colorscheme, colorrange)
   # extract location and scale parameters
-  v = Colorfy.values(colorfier)
-  m = location.(v)
-  s = scale.(v)
-  a, b = extrema(s)
+  μs = location.(values)
+  σs = scale.(values)
+  a, b = extrema(σs)
 
-  # build new colorfier with location as values and alphas based on scale
-  values = m
-  alphas = if a == b
-    fill(1, length(v))
+  # compute alphas based on scale parameters
+  αs = if a == b
+    fill(1, length(μs))
   else
-    @. 1 - (s - a) / (b - a)
+    @. 1 - (σs - a) / (b - a)
   end
-  colorscheme = Colorfy.colorscheme(colorfier)
-  colorrange = Colorfy.colorrange(colorfier)
-  colorfier′ = Colorfier(values; alphas, colorscheme, colorrange)
-  Colorfy.getcolors(colorfier′)
+
+  Colorfy.repr(μs, αs, colorscheme, colorrange)
 end
 
 end
