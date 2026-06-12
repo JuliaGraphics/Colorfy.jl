@@ -76,7 +76,7 @@ using Test
     @test_throws ArgumentError Colorfy.handleargs(values, alphas, :viridis, :extrema)
   end
 
-  @testset "Basic" begin
+  @testset "Basic tests" begin
     values = rand(10)
     colors = colorfy(values)
     result = get(colorschemes[:viridis], values, :extrema)
