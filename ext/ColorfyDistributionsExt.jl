@@ -22,7 +22,7 @@ function Colorfy.repr(values::AbstractVector{<:Distribution}, colorscheme, color
     @. 1 - (σs - a) / (b - a)
   end
 
-  Colorfy.repr(μs, αs, colorscheme, colorrange)
+  Colorfy.colorfy(μs; alpha=αs, colorscheme, colorrange)
 end
 
 end
