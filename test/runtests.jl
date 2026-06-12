@@ -207,20 +207,14 @@ using Test
     stds = rand(10)
     values = Normal.(means, stds)
     alphas = 1 .- (stds .- minimum(stds)) ./ (maximum(stds) - minimum(stds))
-    colors = colorfy(means)
-    @test colorfy(values) == coloralpha.(colors, alphas)
-    @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
-
-    values = Normal.(means, fill(0.5, 10))
-    @test colorfy(values) == coloralpha.(colors, 1)
+    colors = colorfy(means; alphas)
+    @test colorfy(values) == colors
     @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
 
     values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
-    colors = [colorant"transparent"; colorfy([0.5, 0.6, 0.7]); colorant"transparent"]
-    alphas = [0.0, 1.0, 0.5, 0.0, 0.0]
-    colors = colorfy(values)
-    @test colorfy(values) == coloralpha.(colors, alphas)
-    @test colorfy(values, alphas=0.5) == coloralpha.(colors, [0.0, 0.5, 0.5, 0.5, 0.0])
+    colors = [colorant"transparent"; colorfy([0.5, 0.6, 0.7], alphas=[1.0, 0.5, 0.0]); colorant"transparent"]
+    @test colorfy(values) == colors
+    @test colorfy(values, alphas=0.5) == coloralpha.(colors, 0.5)
   end
 
   @testset "Unitful" begin

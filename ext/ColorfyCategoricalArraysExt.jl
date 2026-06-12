@@ -14,7 +14,8 @@ function Colorfy.getcolors(colorfier::Colorfier{<:Values{CategoricalValue}})
   colorscheme = Colorfy.colorscheme(colorfier)
   nlevels = length(levels(values))
   categcolors = colorscheme[range(0, nlevels > 1 ? 1 : 0, length=nlevels)]
-  categcolors[levelcode.(values)]
+  colors = categcolors[levelcode.(values)]
+  coloralpha.(colors, alphas(colorfier))
 end
 
 end

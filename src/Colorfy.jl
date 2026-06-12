@@ -21,10 +21,10 @@ Maps each value in `values` to a color. Colors can be obtained using the [`Color
 
 ## Options
 
-* `alphas` - Scalar or a vector of color alphas (default to `Colorfy.defaultalphas(values)`);
-* `colorscheme` - Color scheme specification (default to `Colorfy.defaultcolorscheme(values)`);
+* `alphas` - Scalar or a vector of color alphas (default to `1.0`);
+* `colorscheme` - Color scheme specification (default to `:viridis`);
 * `colorrange` - Tuple with minimum and maximum color values or a symbol that can be passed 
-  to the `rangescale` argument of the `ColorSchemes.get` function (default to `Colorfy.defaultcolorrange(values)`);
+  to the `rangescale` argument of the `ColorSchemes.get` function (default to `:extrema`);
 """
 struct Colorfier{V,A,S,R}
   values::V
@@ -33,12 +33,12 @@ struct Colorfier{V,A,S,R}
   colorrange::R
 end
 
-function Colorfier(values; alphas=nothing, colorscheme=nothing, colorrange=nothing)
+function Colorfier(values; alphas=1.0, colorscheme=:viridis, colorrange=:extrema)
   values′ = asvalues(values)
-  alphas′ = isnothing(alphas) ? defaultalphas(values′) : alphas
-  colorscheme′ = isnothing(colorscheme) ? defaultcolorscheme(values′) : colorscheme
-  colorrange′ = isnothing(colorrange) ? defaultcolorrange(values′) : colorrange
-  Colorfier(values′, asalphas(alphas′, values′), ascolorscheme(colorscheme′), ascolorrange(colorrange′))
+  alphas′ = asalphas(alphas, values′)
+  colorscheme′ = ascolorscheme(colorscheme)
+  colorrange′ = ascolorrange(colorrange)
+  Colorfier(values′, alphas′, colorscheme′, colorrange′)
 end
 
 """
@@ -49,19 +49,6 @@ Shortcut to `Colorfy.colors(Colorfier(values; kwargs...))` for convenience.
 See also [`Colorfier`](@ref), [`Colorfy.colors`](@ref).
 """
 colorfy(values; kwargs...) = colors(Colorfier(values; kwargs...))
-
-"""
-    Colorfy.update(colorfier; [values, alphas, colorscheme, colorrange])
-
-Constructs a new colorfier with `colorfier` fields and updated fields passed as keyword arguments.
-"""
-update(
-  colorfier::Colorfier;
-  values=values(colorfier),
-  alphas=alphas(colorfier),
-  colorscheme=colorscheme(colorfier),
-  colorrange=colorrange(colorfier)
-) = Colorfier(values; alphas, colorscheme, colorrange)
 
 # --------
 # GETTERS
@@ -100,40 +87,6 @@ colorrange(colorfier::Colorfier) = colorfier.colorrange
 # ----
 
 """
-    Colorfy.defaultalphas(values)
-
-Default color alphas for `values`.
-"""
-function defaultalphas(values::Values)
-  minds = findall(ismissing, values)
-  vinds = setdiff(1:length(values), minds)
-
-  if isempty(minds)
-    fill(1, length(values))
-  else
-    valphas = defaultalphas(nonmissingvec(values[vinds]))
-    malpha = zero(eltype(valphas))
-    genvec(vinds, valphas, minds, malpha, length(values))
-  end
-end
-
-defaultalphas(values::Values{Colorant}) = alpha.(values)
-
-"""
-    Colorfy.defaultcolorscheme(values)
-
-Default color scheme for `values`.
-"""
-defaultcolorscheme(_) = colorschemes[:viridis]
-
-"""
-    Colorfy.defaultcolorrange(values)
-
-Default color range for `values`.
-"""
-defaultcolorrange(_) = :extrema
-
-"""
     Colorfy.asvalues(values)
 
 Valid color values for a given `values`.
@@ -150,7 +103,7 @@ asvalues(values::Values{Colorant{Q0f63}}) = fixcolors(values)
 
 Valid color alphas for a given `alphas` and `values`.
 """
-asalphas(alpha, values) = fill(alpha, length(values))
+asalphas(alpha::Number, values) = fill(alpha, length(values))
 function asalphas(alphas::AbstractVector, values)
   if length(alphas) ≠ length(values)
     throw(ArgumentError("the number of alphas must be equal to the number of values"))
@@ -189,16 +142,18 @@ function colors(colorfier::Colorfier)
   iinds = findall(isinvalid, vals)
   vinds = setdiff(1:length(vals), iinds)
 
+  # construct new colorfier with valid values only
+  vvalues = nonmissingvec(vals[vinds])
+  valphas = alphas(colorfier)[vinds]
+  vcolorscheme = colorscheme(colorfier)
+  vcolorrange = colorrange(colorfier)
+  vcolorfier = Colorfier(vvalues; alphas=valphas, colorscheme=vcolorscheme, colorrange=vcolorrange)
+
   if isempty(iinds)
-    # required to handle Vector{Union{Missing,T}} without missing values
-    vvals = nonmissingvec(vals)
-    vcolorfier = update(colorfier, values=vvals)
-    coloralpha.(getcolors(vcolorfier), alphas(vcolorfier))
+    # all values are valid, so we can directly dispatch methods
+    getcolors(vcolorfier)
   else
     # get valid colors and set "transparent" for invalid values
-    vvals = nonmissingvec(vals[vinds])
-    valphas = alphas(colorfier)[vinds]
-    vcolorfier = update(colorfier, values=vvals, alphas=valphas)
     vcolors = colors(vcolorfier)
     icolor = colorant"transparent"
     genvec(vinds, vcolors, iinds, icolor, length(vals))
@@ -208,8 +163,7 @@ end
 """
     Colorfy.getcolors(colorfier, values)
 
-Function intended for developers that returns the mapped colors from the `colorfier` without the alphas. 
-Alphas are applied in the `Colorfy.colors` function.
+Function intended for developers that returns the mapped colors from the `colorfier`.
 """
 function getcolors(colorfier::Colorfier)
   throw(ArgumentError("""
@@ -218,8 +172,10 @@ function getcolors(colorfier::Colorfier)
   """))
 end
 
-getcolors(colorfier::Colorfier{<:Values{Number}}) =
-  get(colorscheme(colorfier), values(colorfier), colorrange(colorfier))
+function getcolors(colorfier::Colorfier{<:Values{Number}})
+  colors = get(colorscheme(colorfier), values(colorfier), colorrange(colorfier))
+  coloralpha.(colors, alphas(colorfier))
+end
 
 getcolors(colorfier::Colorfier{<:Values{AbstractString}}) = parse.(Ref(Colorant), values(colorfier))
 
@@ -229,13 +185,19 @@ getcolors(colorfier::Colorfier{<:Values{Colorant}}) = values(colorfier)
 
 function getcolors(colorfier::Colorfier{<:Values{DateTime}})
   dvalues = datetime2unix.(values(colorfier))
-  dcolorfier = update(colorfier, values=dvalues)
+  dalphas = alphas(colorfier)
+  dcolorscheme = colorscheme(colorfier)
+  dcolorrange = colorrange(colorfier)
+  dcolorfier = Colorfier(dvalues; alphas=dalphas, colorscheme=dcolorscheme, colorrange=dcolorrange)
   getcolors(dcolorfier)
 end
 
 function getcolors(colorfier::Colorfier{<:Values{Date}})
   dvalues = map(d -> datetime2unix(DateTime(d)), values(colorfier))
-  dcolorfier = update(colorfier, values=dvalues)
+  dalphas = alphas(colorfier)
+  dcolorscheme = colorscheme(colorfier)
+  dcolorrange = colorrange(colorfier)
+  dcolorfier = Colorfier(dvalues; alphas=dalphas, colorscheme=dcolorscheme, colorrange=dcolorrange)
   getcolors(dcolorfier)
 end
 
