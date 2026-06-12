@@ -6,6 +6,7 @@ module ColorfyDistributionsExt
 
 using Distributions: Distribution
 using Distributions: location, scale
+using Colors: coloralpha
 
 import Colorfy
 
@@ -22,7 +23,11 @@ function Colorfy.repr(values::AbstractVector{<:Distribution}, colorscheme, color
     @. 1 - (σs - a) / (b - a)
   end
 
-  Colorfy.colorfy(μs; alpha=αs, colorscheme, colorrange)
+  # get colors for location parameters
+  cs = Colorfy.repr(μs, colorscheme, colorrange)
+
+  # apply alphas to colors
+  coloralpha.(cs, αs)
 end
 
 end

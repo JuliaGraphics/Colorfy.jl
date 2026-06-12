@@ -162,6 +162,7 @@ using Test
     σs = scale.(values)
     a, b = extrema(σs)
     colors = colorfy(μs, alpha=1 .- (σs .- a) ./ (b .- a))
+    colorfy(values)
     @test colorfy(values) == colors
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5)
 
