@@ -76,6 +76,13 @@ ascolorrange(colorrange::NTuple{2,Real}) = promote(colorrange...)
 # IMPLEMENTATIONS
 # ----------------
 
+"""
+    repr(values::AbstractVector{T}, colorscheme, colorrange)
+
+Colorful representation of `values` of type `T` based on `colorscheme` and `colorrange`.
+"""
+function repr end
+
 repr(values::AbstractVector{<:Colorant}, colorscheme, colorrange) = values
 
 repr(values::AbstractVector{<:Number}, colorscheme, colorrange) = get(colorscheme, values, colorrange)
