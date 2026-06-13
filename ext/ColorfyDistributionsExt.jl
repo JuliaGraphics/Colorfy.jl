@@ -10,19 +10,19 @@ using Colors
 import Colorfy
 
 function Colorfy.repr(values::AbstractVector{<:Normal}, colorscheme, colorrange)
-  # extract location and scale parameters
-  μs = location.(values)
-  σs = scale.(values)
+  # extract location and entropy
+  ms = location.(values)
+  hs = entropy.(values)
 
   # derive base colors from location
-  cs = Colorfy.repr(μs, colorscheme, colorrange)
+  cs = Colorfy.repr(ms, colorscheme, colorrange)
 
-  # derive transparency from scale
-  a, b = extrema(σs)
+  # derive transparency from entropy
+  a, b = extrema(hs)
   αs = if a == b
-    fill(1.0, length(μs))
+    fill(1.0, length(hs))
   else
-    @. 1.0 - (σs - a) / (b - a)
+    @. 1.0 - (hs - a) / (b - a)
   end
 
   # return final colors

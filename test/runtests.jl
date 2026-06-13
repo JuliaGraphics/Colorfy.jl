@@ -172,11 +172,11 @@ using Test
   @testset "Distributions" begin
     # Normal distribution
     values = Normal.(rand(10), rand(10))
-    μs = location.(values)
-    σs = scale.(values)
-    a, b = extrema(σs)
-    αs = 1.0 .- (σs .- a) ./ (b .- a)
-    colors = colorfy(μs, alpha=αs)
+    ms = location.(values)
+    hs = entropy.(values)
+    a, b = extrema(hs)
+    αs = 1.0 .- (hs .- a) ./ (b .- a)
+    colors = colorfy(ms, alpha=αs)
     alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
