@@ -185,6 +185,11 @@ using Test
     @test colors[3] != colorant"transparent"
     @test colors[4] != colorant"transparent"
     @test colors[5] == colorant"transparent"
+
+    values = [Normal(1.0, 0.1), Normal(2.0, 0.1)]
+    colors = colorfy(values)
+    alphas = map(Colors.alpha, colors)
+    @test all(==(1.0), alphas)
   end
 
   @testset "Unitful" begin
