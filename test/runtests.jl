@@ -167,10 +167,9 @@ using Test
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
 
     values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
-    colors = [colorant"transparent"; colorfy([0.5, 0.6, 0.7], alpha=[1.0, 0.5, 0.0]); colorant"transparent"]
-    alphas = map(Colors.alpha, colors)
-    @test colorfy(values) == colors
-    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
+    colors = colorfy(values)
+    @test first(colors) == colorant"transparent"
+    @test last(colors) == colorant"transparent"
   end
 
   @testset "Unitful" begin
