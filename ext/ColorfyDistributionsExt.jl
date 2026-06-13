@@ -15,7 +15,10 @@ function Colorfy.repr(values::AbstractVector{<:Distribution}, colorscheme, color
   μs = location.(values)
   σs = scale.(values)
 
-  # compute alphas based on scale parameters
+  # derive base colors from location
+  cs = Colorfy.repr(μs, colorscheme, colorrange)
+
+  # derive transparency from scale
   a, b = extrema(σs)
   αs = if a == b
     fill(1.0, length(μs))
@@ -23,10 +26,7 @@ function Colorfy.repr(values::AbstractVector{<:Distribution}, colorscheme, color
     @. 1.0 - (σs - a) / (b - a)
   end
 
-  # get colors for location parameters
-  cs = Colorfy.repr(μs, colorscheme, colorrange)
-
-  # apply alphas to colors
+  # return final colors
   coloralpha.(cs, αs)
 end
 
