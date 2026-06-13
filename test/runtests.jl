@@ -168,8 +168,11 @@ using Test
 
     values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
     colors = colorfy(values)
-    @test first(colors) == colorant"transparent"
-    @test last(colors) == colorant"transparent"
+    @test colors[1] == colorant"transparent"
+    @test colors[2] != colorant"transparent"
+    @test colors[3] != colorant"transparent"
+    @test colors[4] != colorant"transparent"
+    @test colors[5] == colorant"transparent"
   end
 
   @testset "Unitful" begin
