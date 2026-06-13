@@ -151,22 +151,22 @@ using Test
 
   @testset "CategoricalArrays" begin
     values = categorical(["n", "n", "y", "y", "n", "y"], levels=["y", "n"])
-    lcolors = colorschemes[:viridis][range(0, 1, length=2)]
-    result = lcolors[[2, 2, 1, 1, 2, 1]]
-    @test colorfy(values) == coloralpha.(result, 1)
-    @test colorfy(values, alpha=0.5) == coloralpha.(result, 0.5)
+    cs = colorschemes[:viridis][range(0, 1, length=2)]
+    colors = cs[[2, 2, 1, 1, 2, 1]]
+    @test colorfy(values) == coloralpha.(colors, 1)
+    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5)
 
     values = categorical([2, 1, 1, 3, 1, 3, 3, 2, 1, 2], levels=1:3)
-    lcolors = colorschemes[:viridis][range(0, 1, length=3)]
-    result = lcolors[[2, 1, 1, 3, 1, 3, 3, 2, 1, 2]]
-    @test colorfy(values) == coloralpha.(result, 1)
-    @test colorfy(values, alpha=0.5) == coloralpha.(result, 0.5)
+    cs = colorschemes[:viridis][range(0, 1, length=3)]
+    colors = cs[[2, 1, 1, 3, 1, 3, 3, 2, 1, 2]]
+    @test colorfy(values) == coloralpha.(colors, 1)
+    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5)
 
     values = categorical([1, 1, 1, 1, 1], levels=[1])
-    lcolors = colorschemes[:viridis][range(0, 0, length=1)]
-    result = lcolors[[1, 1, 1, 1, 1]]
-    @test colorfy(values) == coloralpha.(result, 1)
-    @test colorfy(values, alpha=0.5) == coloralpha.(result, 0.5)
+    cs = colorschemes[:viridis][range(1, 1, length=1)]
+    colors = cs[[1, 1, 1, 1, 1]]
+    @test colorfy(values) == coloralpha.(colors, 1)
+    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5)
   end
 
   @testset "Distributions" begin
@@ -204,6 +204,17 @@ using Test
     hs = entropy.(values)
     a, b = 0.0, log(3)
     αs = 1.0 .- (hs .- a) ./ (b - a)
+    colors = colorfy(ms, alpha=αs)
+    alphas = map(Colors.alpha, colors)
+    @test colorfy(values) == colors
+    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
+
+    # Categorical with single category
+    values = [Categorical([1.0])]
+    ms = mode.(values)
+    hs = entropy.(values)
+    a, b = 0.0, log(1)
+    αs = fill(1.0, length(hs))
     colors = colorfy(ms, alpha=αs)
     alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
