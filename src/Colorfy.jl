@@ -49,14 +49,17 @@ function handleargs(values, alphas, colorscheme, colorrange)
   vs, αs, s, r
 end
 
-asvalues(values) = values
-asvalues(values::AbstractVector{<:Colorant}) = values
+asvalues(value::Symbol) = [value]
+asvalues(value::AbstractString) = [value]
 asvalues(values::AbstractVector{<:Colorant{Q0f7}}) = fixcolors(values)
 asvalues(values::AbstractVector{<:Colorant{Q0f15}}) = fixcolors(values)
 asvalues(values::AbstractVector{<:Colorant{Q0f31}}) = fixcolors(values)
 asvalues(values::AbstractVector{<:Colorant{Q0f63}}) = fixcolors(values)
+asvalues(values) = values
 
 asalphas(alpha::Number, values) = fill(alpha, length(values))
+asalphas(alpha::Number, value::Symbol) = [alpha]
+asalphas(alpha::Number, value::AbstractString) = [alpha]
 function asalphas(alphas::AbstractVector, values)
   if length(alphas) ≠ length(values)
     throw(ArgumentError("the number of alphas must be equal to the number of values"))
