@@ -50,7 +50,7 @@ end
 function Colorfy.repr(values::AbstractVector{<:Categorical}, colorscheme, colorrange)
   # sanity check
   ns = ncategories.(values)
-  allunique(ns) || throw(ArgumentError("all categorical distributions must have the same number of categories"))
+  allequal(ns) || throw(ArgumentError("all categorical distributions must have the same number of categories"))
 
   # extract mode and entropy
   ms = mode.(values)
