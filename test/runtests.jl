@@ -162,14 +162,15 @@ using Test
     σs = scale.(values)
     a, b = extrema(σs)
     colors = colorfy(μs, alpha=1 .- (σs .- a) ./ (b .- a))
-    colorfy(values)
+    alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
-    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5)
+    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
 
     values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
     colors = [colorant"transparent"; colorfy([0.5, 0.6, 0.7], alpha=[1.0, 0.5, 0.0]); colorant"transparent"]
+    alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
-    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5)
+    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
   end
 
   @testset "Unitful" begin

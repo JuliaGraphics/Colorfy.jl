@@ -32,7 +32,8 @@ function colorfy(values; alpha=1.0, colorscheme=:viridis, colorrange=:extrema)
 
   # construct colors for valid values
   rcolors = repr(nonmissingvec(vs[vinds]), s, r)
-  vcolors = coloralpha.(rcolors, αs[vinds])
+  ralphas = map(Colors.alpha, rcolors)
+  vcolors = coloralpha.(rcolors, αs[vinds] .* ralphas)
   if isempty(iinds) # all values are valid, return colors directly
     vcolors
   else # set "transparent" color for invalid values
