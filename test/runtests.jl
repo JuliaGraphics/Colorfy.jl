@@ -103,6 +103,10 @@ using Test
     colors2 = colorfy(values, alpha=alphas)
     @test colors2 == coloralpha.(colors1, alphas)
 
+    values = [colorant"red", colorant"green", colorant"blue", colorant"white", colorant"black"]
+    colors = colorfy(values)
+    @test colors == coloralpha.(values, 1)
+
     # invalid values (missing, NaN, Inf) are made transparent
     values = [0.1, missing, 0.2, NaN, 0.3, Inf, 0.4, -Inf, 0.5]
     colors = colorfy(values, alpha=0.5)
