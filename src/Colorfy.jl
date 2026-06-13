@@ -34,6 +34,8 @@ function colorfy(values; alpha=1.0, colorscheme=:viridis, colorrange=:extrema)
   rcolors = repr(nonmissingvec(vs[vinds]), s, r)
   ralphas = map(Colors.alpha, rcolors)
   vcolors = coloralpha.(rcolors, αs[vinds] .* ralphas)
+
+  # construct colors for all values
   if isempty(iinds) # all values are valid, return colors directly
     vcolors
   else # set "transparent" color for invalid values
@@ -49,17 +51,13 @@ function handleargs(values, alphas, colorscheme, colorrange)
   vs, αs, s, r
 end
 
-asvalues(value::Symbol) = [value]
-asvalues(value::AbstractString) = [value]
+asvalues(values) = values
 asvalues(values::AbstractVector{<:Colorant{Q0f7}}) = fixcolors(values)
 asvalues(values::AbstractVector{<:Colorant{Q0f15}}) = fixcolors(values)
 asvalues(values::AbstractVector{<:Colorant{Q0f31}}) = fixcolors(values)
 asvalues(values::AbstractVector{<:Colorant{Q0f63}}) = fixcolors(values)
-asvalues(values) = values
 
 asalphas(alpha::Number, values) = fill(alpha, length(values))
-asalphas(alpha::Number, value::Symbol) = [alpha]
-asalphas(alpha::Number, value::AbstractString) = [alpha]
 function asalphas(alphas::AbstractVector, values)
   if length(alphas) ≠ length(values)
     throw(ArgumentError("the number of alphas must be equal to the number of values"))
