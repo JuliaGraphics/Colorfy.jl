@@ -18,9 +18,9 @@ Convert `values` to Colors.jl colors based on given options.
 
 ## Options
 
-* `alpha` - Scalar or vector of transparency values between 0.0 and 1.0
-* `colorscheme` - Color scheme from ColorSchemes.jl (e.g., "viridis", ["black", "white"])
-* `colorrange` - Minimum and maximum values or a symbol (see `ColorSchemes.get`)
+* `alpha`       - scalar or vector of transparency values between 0.0 and 1.0
+* `colorscheme` - color scheme from ColorSchemes.jl (e.g., "viridis", ["black", "white"])
+* `colorrange`  - minimum and maximum values or a symbol (see `ColorSchemes.get`)
 """
 function colorfy(values; alpha=1.0, colorscheme=:viridis, colorrange=:extrema)
   # handle input arguments
