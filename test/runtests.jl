@@ -5,6 +5,7 @@ using FixedPointNumbers
 using CategoricalArrays
 using Distributions
 using Unitful
+using CoDa
 using Dates
 using Test
 
@@ -198,5 +199,12 @@ using Test
     @test colorfy(values, alpha=0.5) == colorfy(ustrip.(values), alpha=0.5)
     @test colorfy(values, colorrange=(0.25, 0.75)) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
     @test colorfy(values, colorrange=(0.25u"m", 0.75u"m")) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
+  end
+
+  @testset "CoDa" begin
+    values = [Composition(1, 1, 1), Composition(1, 0, 0)]
+    colors = colorfy(values)
+    alphas = map(Colors.alpha, colors)
+    @test alphas[1] < alphas[2]
   end
 end
