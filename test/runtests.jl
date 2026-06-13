@@ -119,7 +119,7 @@ using Test
     colors = colorfy(values)
     @test all(c -> c == colorant"transparent", colors)
 
-    # Vector{Union{Missing,T}} whitout missing values
+    # Vector{Union{Missing,T}} without missing values
     values = Union{Missing,Int}[1, 2, 3, 4, 5]
     @test colorfy(values) == colorfy([1, 2, 3, 4, 5])
 

@@ -8,8 +8,8 @@ defined by [Colors.jl](https://github.com/JuliaGraphics/Colors.jl).
 
 ## Usage
 
-The `colorfy` function takes any vector of values with options
-(e.g., alpha, colorscheme) and converts into valid colors:
+The `colorfy` function takes a vector of values with options
+(e.g., `alpha`, `colorscheme`) and converts them into valid colors:
 
 ```julia
 julia> values = [:red, :green, :blue];
