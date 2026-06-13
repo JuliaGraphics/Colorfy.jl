@@ -170,15 +170,53 @@ using Test
   end
 
   @testset "Distributions" begin
+    # Normal distribution
     values = Normal.(rand(10), rand(10))
     μs = location.(values)
     σs = scale.(values)
     a, b = extrema(σs)
-    colors = colorfy(μs, alpha=1 .- (σs .- a) ./ (b .- a))
+    αs = 1.0 .- (σs .- a) ./ (b .- a)
+    colors = colorfy(μs, alpha=αs)
     alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
 
+    # constant dispersion leads to constant transparency
+    values = [Normal(1.0, 0.1), Normal(2.0, 0.1)]
+    colors = colorfy(values)
+    alphas = map(Colors.alpha, colors)
+    @test all(==(1.0), alphas)
+
+    # Bernoulli distribution
+    values = Bernoulli.(rand(10))
+    ms = mode.(values) .+ 1
+    hs = entropy.(values)
+    a, b = 0.0, log(2)
+    αs = 1.0 .- (hs .- a) ./ (b - a)
+    colors = colorfy(ms, alpha=αs)
+    alphas = map(Colors.alpha, colors)
+    @test colorfy(values) == colors
+    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
+
+    # Categorical distribution
+    values = Categorical.([rand(Dirichlet([1.0, 1.0, 1.0])) for _ in 1:10])
+    ms = mode.(values)
+    hs = entropy.(values)
+    a, b = 0.0, log(3)
+    αs = 1.0 .- (hs .- a) ./ (b - a)
+    colors = colorfy(ms, alpha=αs)
+    alphas = map(Colors.alpha, colors)
+    @test colorfy(values) == colors
+    @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
+
+    # heterogeneous vector of distributions
+    values = [Normal(0.5, 0.5), Bernoulli(0.7), Categorical([0.2, 0.5, 0.3])]
+    colors = colorfy(values)
+    @test colors[1] != colorant"transparent"
+    @test colors[2] != colorant"transparent"
+    @test colors[3] != colorant"transparent"
+
+    # distributions and missing values are handled together
     values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
     colors = colorfy(values)
     @test colors[1] == colorant"transparent"
@@ -186,11 +224,6 @@ using Test
     @test colors[3] != colorant"transparent"
     @test colors[4] != colorant"transparent"
     @test colors[5] == colorant"transparent"
-
-    values = [Normal(1.0, 0.1), Normal(2.0, 0.1)]
-    colors = colorfy(values)
-    alphas = map(Colors.alpha, colors)
-    @test all(==(1.0), alphas)
   end
 
   @testset "Unitful" begin
