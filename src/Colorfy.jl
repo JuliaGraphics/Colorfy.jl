@@ -30,6 +30,9 @@ function colorfy(values; alpha=1.0, colorscheme=:viridis, colorrange=:extrema)
   iinds = findall(isinvalid, vs)
   vinds = setdiff(1:length(vs), iinds)
 
+  # if all values are invalid, return transparent colors
+  isempty(vinds) && return fill(colorant"transparent", length(values))
+
   # construct colors for valid values
   rcolors = repr(nonmissingvec(vs[vinds]), s, r)
   ralphas = map(Colors.alpha, rcolors)
@@ -83,7 +86,14 @@ ascolorrange(colorrange::NTuple{2,Real}) = promote(colorrange...)
 
 Colorful representation of `values` of type `T` based on `colorscheme` and `colorrange`.
 """
-function repr end
+function repr(values::AbstractVector{T}, colorscheme, colorrange) where {T}
+  throw(ArgumentError("""
+    values of type `$T` do not have a colorful representation.
+
+    Please make sure your vector has a concrete element type
+    and that a `Colorfy.repr` method exists for it.
+    """))
+end
 
 repr(values::AbstractVector{<:Colorant}, colorscheme, colorrange) = values
 
@@ -95,7 +105,8 @@ repr(values::AbstractVector{<:AbstractString}, colorscheme, colorrange) = parse.
 
 repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(DateTime.(values), colorscheme, colorrange)
 
-repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) = repr(datetime2unix.(values), colorscheme, colorrange)
+repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) =
+  repr(datetime2unix.(values), colorscheme, colorrange)
 
 # -----------------
 # HELPER FUNCTIONS

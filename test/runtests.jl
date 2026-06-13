@@ -103,7 +103,7 @@ using Test
     colors2 = colorfy(values, alpha=alphas)
     @test colors2 == coloralpha.(colors1, alphas)
 
-    # invalid values (missing, NaN, Inf) should be colored as "transparent"
+    # invalid values (missing, NaN, Inf) are made transparent
     values = [0.1, missing, 0.2, NaN, 0.3, Inf, 0.4, -Inf, 0.5]
     colors = colorfy(values, alpha=0.5)
     @test colors[2] == colorant"transparent"
@@ -111,15 +111,23 @@ using Test
     @test colors[6] == colorant"transparent"
     @test colors[8] == colorant"transparent"
 
+    # if all values are invalid, return transparent colors
+    values = [missing, NaN, Inf, -Inf]
+    colors = colorfy(values)
+    @test all(c -> c == colorant"transparent", colors)
+    values = [missing, missing, missing, missing]
+    colors = colorfy(values)
+    @test all(c -> c == colorant"transparent", colors)
+
     # Vector{Union{Missing,T}} whitout missing values
     values = Union{Missing,Int}[1, 2, 3, 4, 5]
     @test colorfy(values) == colorfy([1, 2, 3, 4, 5])
 
     # error: unsupported values
     values = [nothing, nothing, nothing]
-    @test_throws MethodError colorfy(values)
+    @test_throws ArgumentError colorfy(values)
     values = Any[:red, :green, :blue] # vector with non-concrete eltype
-    @test_throws MethodError colorfy(values)
+    @test_throws ArgumentError colorfy(values)
   end
 
   @testset "Dates" begin
