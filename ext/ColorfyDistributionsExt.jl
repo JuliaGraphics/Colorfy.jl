@@ -4,30 +4,93 @@
 
 module ColorfyDistributionsExt
 
-using Distributions: Distribution
-using Distributions: location, scale
-using Colors: coloralpha
+using Distributions
+using Colors
 
 import Colorfy
 
-function Colorfy.repr(values::AbstractVector{<:Distribution}, colorscheme, colorrange)
-  # extract location and scale parameters
-  μs = location.(values)
-  σs = scale.(values)
+function Colorfy.repr(values::AbstractVector{<:Normal}, colorscheme, colorrange)
+  # extract location and entropy
+  ms = location.(values)
+  hs = entropy.(values)
 
   # derive base colors from location
-  cs = Colorfy.repr(μs, colorscheme, colorrange)
+  cs = Colorfy.repr(ms, colorscheme, colorrange)
 
-  # derive transparency from scale
-  a, b = extrema(σs)
+  # derive transparency from entropy
+  a, b = extrema(hs)
   αs = if a == b
-    fill(1.0, length(μs))
+    fill(1.0, length(hs))
   else
-    @. 1.0 - (σs - a) / (b - a)
+    @. 1.0 - (hs - a) / (b - a)
   end
 
   # return final colors
   coloralpha.(cs, αs)
+end
+
+function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colorscheme, colorrange)
+  # extract mode and entropy
+  ms = mode.(values) .+ 1
+  hs = entropy.(values)
+
+  # derive base colors from mode
+  n = 2
+  c = colorscheme[range(0, 1, length=n)]
+  cs = c[ms]
+
+  # derive transparency from entropy
+  a, b = 0.0, log(n)
+  αs = @. 1.0 - (hs - a) / (b - a)
+
+  # return final colors
+  coloralpha.(cs, αs)
+end
+
+function Colorfy.repr(values::AbstractVector{<:Categorical}, colorscheme, colorrange)
+  # sanity check
+  ns = ncategories.(values)
+  allequal(ns) || throw(ArgumentError("all categorical distributions must have the same number of categories"))
+
+  # extract mode and entropy
+  ms = mode.(values)
+  hs = entropy.(values)
+
+  # derive base colors from mode
+  n = first(ns)
+  c = colorscheme[range(n > 1 ? 0 : 1, 1, length=n)]
+  cs = c[ms]
+
+  # derive transparency from entropy
+  a, b = 0.0, log(n)
+  αs = if a == b
+    fill(1.0, length(hs))
+  else
+    @. 1.0 - (hs - a) / (b - a)
+  end
+
+  # return final colors
+  coloralpha.(cs, αs)
+end
+
+# fallback for heterogeneous vectors of distributions
+function Colorfy.repr(values::AbstractVector{<:Distribution}, colorscheme, colorrange)
+  # find unique distribution types
+  Ds = unique(map(typeof, values))
+
+  # initialize with transparent colors
+  transp = coloralpha(colorant"transparent", 0.0)
+  colors = fill(transp, length(values))
+
+  # fill colors for each distribution type
+  for D in Ds
+    inds = findall(d -> d isa D, values)
+    vals = collect(D, values[inds])
+    colors[inds] = Colorfy.repr(vals, colorscheme, colorrange)
+  end
+
+  # return final colors
+  colors
 end
 
 end

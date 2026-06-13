@@ -18,10 +18,10 @@ The `colorfy` function takes a vector of values with options
 julia> values = [:red, :green, :blue];
 
 julia> colorfy(values, alpha=[0.5, 0.6, 0.7])
-3-element Array{RGBA{N0f8},1} with eltype ColorTypes.RGBA{FixedPointNumbers.N0f8}:
- RGBA{N0f8}(1.0,0.0,0.0,0.5)
- RGBA{N0f8}(0.0,0.502,0.0,0.6)
- RGBA{N0f8}(0.0,0.0,1.0,0.7)
+3-element Vector{RGBA{FixedPointNumbers.N0f8}}:
+ RGBA(1.0, 0.0, 0.0, 0.502)
+ RGBA(0.0, 0.502, 0.0, 0.6)
+ RGBA(0.0, 0.0, 1.0, 0.698)
 ```
 
 Please check the `colorfy` docstring for more details.
