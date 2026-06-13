@@ -171,7 +171,7 @@ using Test
 
   @testset "Distributions" begin
     # Normal distribution
-    values = Normal.(rand(10), rand(10))
+    values = [Normal(0.0, 0.1), Normal(0.5, 0.2)]
     ms = location.(values)
     hs = entropy.(values)
     a, b = extrema(hs)

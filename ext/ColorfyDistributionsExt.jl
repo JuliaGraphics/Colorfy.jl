@@ -48,12 +48,16 @@ function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colorscheme, colorran
 end
 
 function Colorfy.repr(values::AbstractVector{<:Categorical}, colorscheme, colorrange)
+  # sanity check
+  ns = ncategories.(values)
+  allunique(ns) || throw(ArgumentError("all categorical distributions must have the same number of categories"))
+
   # extract mode and entropy
   ms = mode.(values)
   hs = entropy.(values)
 
   # derive base colors from mode
-  n = ncategories(first(values))
+  n = first(ns)
   c = colorscheme[range(0, n > 1 ? 1 : 0, length=n)]
   cs = c[ms]
 
