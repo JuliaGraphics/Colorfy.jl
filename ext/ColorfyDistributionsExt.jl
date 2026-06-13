@@ -59,8 +59,11 @@ function Colorfy.repr(values::AbstractVector{<:Categorical}, colorscheme, colorr
 
   # derive transparency from entropy
   a, b = 0.0, log(n)
-  αs = @. 1.0 - (hs - a) / (b - a)
-
+  αs = if a == b
+    fill(1.0, length(hs))
+  else
+    @. 1.0 - (hs - a) / (b - a)
+  end
   # return final colors
   coloralpha.(cs, αs)
 end
