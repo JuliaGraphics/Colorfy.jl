@@ -3,8 +3,11 @@
 [![Build Status](https://github.com/JuliaGraphics/Colorfy.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JuliaGraphics/Colorfy.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/JuliaGraphics/Colorfy.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JuliaGraphics/Colorfy.jl)
 
-Colorfy.jl is a package for mapping Julia objects into colors
-defined by [Colors.jl](https://github.com/JuliaGraphics/Colors.jl).
+Colorfy.jl is a utility package to convert vectors of values into
+[Colors.jl](https://github.com/JuliaGraphics/Colors.jl) colors.
+
+It supports missing values, units, and other data types through
+package extensions.
 
 ## Usage
 
@@ -23,5 +26,8 @@ julia> colorfy(values, alpha=[0.5, 0.6, 0.7])
 
 Please check the `colorfy` docstring for more details.
 
-Developers can register colorful representations for their
-types by implementing methods for the `Colorfy.repr` function.
+## Contributing
+
+Developers can register colorful representations for their types
+by adding methods to the `Colorfy.repr` function in package extensions.
+Please check the `ext` folder for examples.
