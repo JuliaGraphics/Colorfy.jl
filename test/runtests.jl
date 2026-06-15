@@ -220,12 +220,12 @@ using Test
     @test colorfy(values) == colors
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
 
-    # heterogeneous vector of distributions
-    values = [Normal(0.5, 0.5), Bernoulli(0.7), Categorical([0.2, 0.5, 0.3])]
+    # Diract delta distribution
+    values = [Dirac(1), Dirac(2), Dirac(3)]
     colors = colorfy(values)
-    @test colors[1] != colorant"transparent"
-    @test colors[2] != colorant"transparent"
-    @test colors[3] != colorant"transparent"
+    @test colors[1] != colorschemes[:viridis][0.0]
+    @test colors[2] != colorschemes[:viridis][0.5]
+    @test colors[3] != colorschemes[:viridis][1.0]
 
     # distributions and missing values are handled together
     values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
