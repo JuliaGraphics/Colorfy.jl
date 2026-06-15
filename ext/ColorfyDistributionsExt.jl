@@ -9,6 +9,9 @@ using Colors
 
 import Colorfy
 
+Colorfy.repr(values::AbstractVector{<:Dirac}, colorscheme, colorrange) =
+  Colorfy.repr(mode.(values), colorscheme, colorrange)
+
 function Colorfy.repr(values::AbstractVector{<:Normal}, colorscheme, colorrange)
   # extract location and entropy
   ms = location.(values)
@@ -71,26 +74,6 @@ function Colorfy.repr(values::AbstractVector{<:Categorical}, colorscheme, colorr
 
   # return final colors
   coloralpha.(cs, αs)
-end
-
-# fallback for heterogeneous vectors of distributions
-function Colorfy.repr(values::AbstractVector{<:Distribution}, colorscheme, colorrange)
-  # find unique distribution types
-  Ds = unique(map(typeof, values))
-
-  # initialize with transparent colors
-  transp = coloralpha(colorant"transparent", 0.0)
-  colors = fill(transp, length(values))
-
-  # fill colors for each distribution type
-  for D in Ds
-    inds = findall(d -> d isa D, values)
-    vals = collect(D, values[inds])
-    colors[inds] = Colorfy.repr(vals, colorscheme, colorrange)
-  end
-
-  # return final colors
-  colors
 end
 
 end
