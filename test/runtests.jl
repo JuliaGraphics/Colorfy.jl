@@ -141,12 +141,14 @@ using Test
     colors2 = colorfy(datetime2unix.(values))
     @test colors1 == colors2
     @test colorfy(values, alpha=0.5) == coloralpha.(colors1, 0.5)
+    @test Colorfy.nominal(values) == datetime2unix.(values)
 
     values = today() .+ Day.(1:10)
     colors1 = colorfy(values)
     colors2 = colorfy(DateTime.(values))
     @test colors1 == colors2
     @test colorfy(values, alpha=0.5) == coloralpha.(colors1, 0.5)
+    @test Colorfy.nominal(values) == datetime2unix.(DateTime.(values))
   end
 
   @testset "CategoricalArrays" begin
@@ -155,18 +157,21 @@ using Test
     colors = cs[[2, 2, 1, 1, 2, 1]]
     @test colorfy(values) == coloralpha.(colors, 1)
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5)
+    @test Colorfy.nominal(values) == [2, 2, 1, 1, 2, 1]
 
-    values = categorical([2, 1, 1, 3, 1, 3, 3, 2, 1, 2], levels=1:3)
+    values = categorical([2, 1, 1, 3, 1, 3, 3, 2, 1, 2])
     cs = colorschemes[:viridis][range(0, 1, length=3)]
     colors = cs[[2, 1, 1, 3, 1, 3, 3, 2, 1, 2]]
     @test colorfy(values) == coloralpha.(colors, 1)
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5)
+    @test Colorfy.nominal(values) == [2, 1, 1, 3, 1, 3, 3, 2, 1, 2]
 
-    values = categorical([1, 1, 1, 1, 1], levels=[1])
+    values = categorical([1, 1, 1, 1, 1])
     cs = colorschemes[:viridis][range(1, 1, length=1)]
     colors = cs[[1, 1, 1, 1, 1]]
     @test colorfy(values) == coloralpha.(colors, 1)
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5)
+    @test Colorfy.nominal(values) == [1, 1, 1, 1, 1]
   end
 
   @testset "Distributions" begin
@@ -180,12 +185,14 @@ using Test
     alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
+    @test Colorfy.nominal(values) == ms
 
     # constant dispersion leads to constant transparency
     values = [Normal(1.0, 0.1), Normal(2.0, 0.1)]
     colors = colorfy(values)
     alphas = map(Colors.alpha, colors)
     @test all(==(1.0), alphas)
+    @test Colorfy.nominal(values) == location.(values)
 
     # Bernoulli distribution
     values = Bernoulli.(rand(10))
@@ -197,6 +204,7 @@ using Test
     alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
+    @test Colorfy.nominal(values) == ms
 
     # Categorical distribution
     values = Categorical.([rand(Dirichlet([1.0, 1.0, 1.0])) for _ in 1:10])
@@ -208,6 +216,7 @@ using Test
     alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
+    @test Colorfy.nominal(values) == ms
 
     # Categorical with single category
     values = [Categorical([1.0])]
@@ -219,6 +228,7 @@ using Test
     alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
+    @test Colorfy.nominal(values) == ms
 
     # Diract delta distribution
     values = [Dirac(1), Dirac(2), Dirac(3)]
@@ -226,6 +236,7 @@ using Test
     @test colors[1] != colorschemes[:viridis][0.0]
     @test colors[2] != colorschemes[:viridis][0.5]
     @test colors[3] != colorschemes[:viridis][1.0]
+    @test Colorfy.nominal(values) == [1, 2, 3]
 
     # distributions and missing values are handled together
     values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
@@ -243,6 +254,7 @@ using Test
     @test colorfy(values, alpha=0.5) == colorfy(ustrip.(values), alpha=0.5)
     @test colorfy(values, colorrange=(0.25, 0.75)) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
     @test colorfy(values, colorrange=(0.25u"m", 0.75u"m")) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
+    @test Colorfy.nominal(values) == ustrip.(values)
   end
 
   @testset "CoDa" begin
@@ -250,5 +262,6 @@ using Test
     colors = colorfy(values)
     alphas = map(Colors.alpha, colors)
     @test alphas[1] < alphas[2]
+    @test Colorfy.nominal(values) == [1, 1]
   end
 end
