@@ -269,7 +269,7 @@ using Test
   end
 
   @testset "Advanced tests" begin
-    # distributions and missing values are handled together
+    # distributions and missing values
     values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
     colors = colorfy(values)
     @test colors[1] == colorant"transparent"
@@ -278,5 +278,14 @@ using Test
     @test colors[4] != colorant"transparent"
     @test colors[5] == colorant"transparent"
     @test isequal(Colorfy.nominal(values), [missing, 0.5, 0.6, 0.7, missing])
+
+    # NaN and Inf values with units
+    values = [0.1, 0.2, 0.3, NaN, Inf, -Inf] * u"K"
+    colors = colorfy(values)
+    @test colors[1:3] == colorfy(values[1:3])
+    @test colors[4] == colorant"transparent"
+    @test colors[5] == colorant"transparent"
+    @test colors[6] == colorant"transparent"
+    @test isequal(Colorfy.nominal(values), [0.1, 0.2, 0.3, missing, missing, missing])
   end
 end
