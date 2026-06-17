@@ -12,7 +12,9 @@ import Colorfy
 function Colorfy.repr(values::AbstractVector{<:CategoricalValue}, colorscheme, colorrange)
   n = length(levels(values))
   c = colorscheme[range(n > 1 ? 0 : 1, 1, length=n)]
-  c[levelcode.(values)]
+  c[map(levelcode, values)]
 end
+
+Colorfy.nominal(values::AbstractVector{<:CategoricalValue}) = map(levelcode, values)
 
 end
