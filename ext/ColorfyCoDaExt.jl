@@ -35,6 +35,6 @@ function Colorfy.repr(values::AbstractVector{<:Composition}, colorscheme, colorr
   map(coloralpha, cs, αs)
 end
 
-nominal(values::AbstractVector{<:Composition}) = map(argmax ∘ components, values)
+Colorfy.nominal(values::AbstractVector{<:Composition}) = map(argmax ∘ components, values)
 
 end

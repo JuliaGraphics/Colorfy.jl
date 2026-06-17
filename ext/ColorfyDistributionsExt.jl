@@ -14,8 +14,8 @@ Colorfy.repr(values::AbstractVector{<:Dirac}, colorscheme, colorrange) =
 
 function Colorfy.repr(values::AbstractVector{<:Normal}, colorscheme, colorrange)
   # extract location and entropy
-  ms = location.(values)
-  hs = entropy.(values)
+  ms = map(location, values)
+  hs = map(entropy, values)
 
   # derive base colors from location
   cs = Colorfy.repr(ms, colorscheme, colorrange)
@@ -29,13 +29,13 @@ function Colorfy.repr(values::AbstractVector{<:Normal}, colorscheme, colorrange)
   end
 
   # return final colors
-  coloralpha.(cs, αs)
+  map(coloralpha, cs, αs)
 end
 
 function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colorscheme, colorrange)
   # extract mode and entropy
-  ms = mode.(values) .+ 1
-  hs = entropy.(values)
+  ms = map(v -> mode(v) + 1, values)
+  hs = map(entropy, values)
 
   # derive base colors from mode
   n = 2
@@ -47,17 +47,17 @@ function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colorscheme, colorran
   αs = @. 1.0 - (hs - a) / (b - a)
 
   # return final colors
-  coloralpha.(cs, αs)
+  map(coloralpha, cs, αs)
 end
 
 function Colorfy.repr(values::AbstractVector{<:Categorical}, colorscheme, colorrange)
   # sanity check
-  ns = ncategories.(values)
+  ns = map(ncategories, values)
   allequal(ns) || throw(ArgumentError("all categorical distributions must have the same number of categories"))
 
   # extract mode and entropy
-  ms = mode.(values)
-  hs = entropy.(values)
+  ms = map(mode, values)
+  hs = map(entropy, values)
 
   # derive base colors from mode
   n = first(ns)
@@ -73,7 +73,13 @@ function Colorfy.repr(values::AbstractVector{<:Categorical}, colorscheme, colorr
   end
 
   # return final colors
-  coloralpha.(cs, αs)
+  map(coloralpha, cs, αs)
 end
+
+Colorfy.nominal(values::AbstractVector{<:Bernoulli}) = map(v -> mode(v) + 1, values)
+
+Colorfy.nominal(values::AbstractVector{<:ContinuousUnivariateDistribution}) = map(location, values)
+
+Colorfy.nominal(values::AbstractVector{<:DiscreteUnivariateDistribution}) = map(mode, values)
 
 end
