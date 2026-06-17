@@ -42,7 +42,7 @@ function colorfy(values; alpha=1.0, colorscheme=:viridis, colorrange=:extrema)
   if isempty(iinds) # all values are valid, return colors directly
     vcolors
   else # set "transparent" color for invalid values
-    genvec(vinds, vcolors, iinds, colorant"transparent", length(values))
+    genvec(vinds, vcolors, iinds, colorant"transparent")
   end
 end
 
@@ -79,6 +79,32 @@ function ascolorrange(colorrange::NTuple{2,Number})
   Tuple(nominal(collect(crange)))
 end
 
+"""
+    nominal(values)
+
+Nominal representation of `values` for color mapping.
+This function is used to convert non-numeric values to
+numeric values that can be used in ticks and color bars.
+"""
+function nominal(values)
+  # find invalid and valid indices
+  iinds = findall(isinvalid, values)
+  vinds = setdiff(1:length(values), iinds)
+
+  # if all values are invalid, return missing values
+  isempty(vinds) && return fill(missing, length(values))
+
+  # construct nominal values for valid values
+  vvalues = nominal(nonmissingvec(values[vinds]))
+
+  # construct nominal values for all values
+  if isempty(iinds) # all values are valid, return nominal values directly
+    vvalues
+  else # set missing value for invalid values
+    genvec(vinds, vvalues, iinds, missing)
+  end
+end
+
 # ----------------
 # IMPLEMENTATIONS
 # ----------------
@@ -110,22 +136,6 @@ repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(map(DateTim
 repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) =
   repr(map(datetime2unix, values), colorscheme, colorrange)
 
-"""
-    nominal(values::AbstractVector{T})
-
-Nominal representation of `values` of type `T` for color mapping.
-This is used to convert non-numeric values to numeric values that
-can be used in ticks and color bars.
-"""
-function nominal(values::AbstractVector{T}) where {T}
-  throw(ArgumentError("""
-    values of type `$T` do not have a nominal representation.
-
-    Please make sure your vector has a concrete element type
-    and that a `Colorfy.nominal` method exists for it.
-    """))
-end
-
 nominal(values::AbstractVector{<:Number}) = values
 
 nominal(values::AbstractVector{<:Date}) = nominal(map(DateTime, values))
@@ -142,10 +152,13 @@ fixcolors(colors) = convert.(floattype(eltype(colors)), colors)
 
 nonmissingvec(values::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, values)
 
-function genvec(vecinds, vec, valinds, val, len)
-  valdict = Dict(i => val for i in valinds)
-  merge!(valdict, Dict(zip(vecinds, vec)))
-  [valdict[i] for i in 1:len]
+function genvec(vecinds, vec, valinds, val)
+  T = promote_type(eltype(vec), typeof(val))
+  n = length(vecinds) + length(valinds)
+  v = Vector{T}(undef, n)
+  v[vecinds] .= vec
+  v[valinds] .= val
+  v
 end
 
 end

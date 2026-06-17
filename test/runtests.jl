@@ -237,15 +237,6 @@ using Test
     @test colors[2] != colorschemes[:viridis][0.5]
     @test colors[3] != colorschemes[:viridis][1.0]
     @test Colorfy.nominal(values) == [1, 2, 3]
-
-    # distributions and missing values are handled together
-    values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
-    colors = colorfy(values)
-    @test colors[1] == colorant"transparent"
-    @test colors[2] != colorant"transparent"
-    @test colors[3] != colorant"transparent"
-    @test colors[4] != colorant"transparent"
-    @test colors[5] == colorant"transparent"
   end
 
   @testset "Unitful" begin
@@ -263,5 +254,17 @@ using Test
     alphas = map(Colors.alpha, colors)
     @test alphas[1] < alphas[2]
     @test Colorfy.nominal(values) == [1, 1]
+  end
+
+  @testset "Advanced tests" begin
+    # distributions and missing values are handled together
+    values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
+    colors = colorfy(values)
+    @test colors[1] == colorant"transparent"
+    @test colors[2] != colorant"transparent"
+    @test colors[3] != colorant"transparent"
+    @test colors[4] != colorant"transparent"
+    @test colors[5] == colorant"transparent"
+    @test isequal(Colorfy.nominal(values), [missing, 0.5, 0.6, 0.7, missing])
   end
 end
