@@ -38,12 +38,11 @@ function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colorscheme, colorran
   hs = map(entropy, values)
 
   # derive base colors from mode
-  n = 2
-  c = get(colorscheme, 1:n, colorrange)
+  c = get(colorscheme, 0:1, colorrange)
   cs = c[ms .+ 1]
 
   # derive transparency from entropy
-  a, b = 0.0, log(n)
+  a, b = 0.0, log(2)
   αs = @. 1.0 - (hs - a) / (b - a)
 
   # return final colors
