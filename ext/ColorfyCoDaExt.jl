@@ -25,14 +25,16 @@ function Colorfy.repr(values::AbstractVector{<:Composition}, colorscheme, colorr
   # derive base color from mode
   n = length(first(ps))
   c = colorscheme[range(n > 1 ? 0 : 1, 1, length=n)]
-  cs = c[argmax.(ps)]
+  cs = c[map(argmax, ps)]
 
   # derive transparency from entropy
   a, b = 0.0, log(n)
   αs = @. 1.0 - (hs - a) / (b - a)
 
   # return final color
-  coloralpha.(cs, αs)
+  map(coloralpha, cs, αs)
 end
+
+nominal(values::AbstractVector{<:Composition}) = map(argmax ∘ components, values)
 
 end

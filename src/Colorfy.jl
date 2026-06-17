@@ -74,8 +74,10 @@ ascolorscheme(colorscheme::AbstractVector) = ColorScheme([parse(Colorant, color)
 ascolorscheme(colorscheme::ColorScheme) = colorscheme
 
 ascolorrange(colorrange::Symbol) = colorrange
-ascolorrange(colorrange::NTuple{2,T}) where {T<:Real} = colorrange
-ascolorrange(colorrange::NTuple{2,Real}) = promote(colorrange...)
+function ascolorrange(colorrange::NTuple{2,Number})
+  crange = promote(colorrange...)
+  Tuple(nominal(collect(crange)))
+end
 
 # ----------------
 # IMPLEMENTATIONS
@@ -99,14 +101,36 @@ repr(values::AbstractVector{<:Colorant}, colorscheme, colorrange) = values
 
 repr(values::AbstractVector{<:Number}, colorscheme, colorrange) = get(colorscheme, values, colorrange)
 
-repr(values::AbstractVector{<:Symbol}, colorscheme, colorrange) = repr(string.(values), colorscheme, colorrange)
+repr(values::AbstractVector{<:Symbol}, colorscheme, colorrange) = repr(map(string, values), colorscheme, colorrange)
 
-repr(values::AbstractVector{<:AbstractString}, colorscheme, colorrange) = parse.(Ref(Colorant), values)
+repr(values::AbstractVector{<:AbstractString}, colorscheme, colorrange) = map(v -> parse(Colorant, v), values)
 
-repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(DateTime.(values), colorscheme, colorrange)
+repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(map(DateTime, values), colorscheme, colorrange)
 
 repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) =
-  repr(datetime2unix.(values), colorscheme, colorrange)
+  repr(map(datetime2unix, values), colorscheme, colorrange)
+
+"""
+    nominal(values::AbstractVector{T})
+
+Nominal representation of `values` of type `T` for color mapping.
+This is used to convert non-numeric values to numeric values that
+can be used in ticks and color bars.
+"""
+function nominal(values::AbstractVector{T}) where {T}
+  throw(ArgumentError("""
+    values of type `$T` do not have a nominal representation.
+
+    Please make sure your vector has a concrete element type
+    and that a `Colorfy.nominal` method exists for it.
+    """))
+end
+
+nominal(values::AbstractVector{<:Number}) = values
+
+nominal(values::AbstractVector{<:Date}) = nominal(map(DateTime, values))
+
+nominal(values::AbstractVector{<:DateTime}) = map(datetime2unix, values)
 
 # -----------------
 # HELPER FUNCTIONS

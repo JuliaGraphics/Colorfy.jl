@@ -10,8 +10,8 @@ using Unitful: ustrip
 import Colorfy
 
 Colorfy.repr(values::AbstractVector{<:Quantity}, colorscheme, colorrange) =
-  Colorfy.repr(ustrip.(values), colorscheme, colorrange)
+  Colorfy.repr(map(ustrip, values), colorscheme, colorrange)
 
-Colorfy.ascolorrange(colorrange::NTuple{2,Quantity}) = Colorfy.ascolorrange(ustrip.(colorrange))
+Colorfy.nominal(values::AbstractVector{<:Quantity}) = map(ustrip, values)
 
 end
