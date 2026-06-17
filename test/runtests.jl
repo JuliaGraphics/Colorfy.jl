@@ -120,13 +120,16 @@ using Test
     values = [missing, NaN, Inf, -Inf]
     colors = colorfy(values)
     @test all(c -> c == colorant"transparent", colors)
+    @test isequal(Colorfy.nominal(values), [missing, missing, missing, missing])
     values = [missing, missing, missing, missing]
     colors = colorfy(values)
     @test all(c -> c == colorant"transparent", colors)
+    @test isequal(Colorfy.nominal(values), [missing, missing, missing, missing])
 
     # Vector{Union{Missing,T}} without missing values
     values = Union{Missing,Int}[1, 2, 3, 4, 5]
     @test colorfy(values) == colorfy([1, 2, 3, 4, 5])
+    @test Colorfy.nominal(values) == [1, 2, 3, 4, 5]
 
     # error: unsupported values
     values = [nothing, nothing, nothing]
