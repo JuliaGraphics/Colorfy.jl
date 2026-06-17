@@ -12,6 +12,6 @@ import Colorfy
 Colorfy.repr(values::AbstractVector{<:Quantity}, colorscheme, colorrange) =
   Colorfy.repr(map(ustrip, values), colorscheme, colorrange)
 
-Colorfy.nominal(values::AbstractVector{<:Quantity}) = map(ustrip, values)
+Colorfy.nominal(values::AbstractVector{<:Quantity}) = Colorfy.nominal(map(ustrip, values))
 
 end

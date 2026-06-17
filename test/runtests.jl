@@ -199,11 +199,11 @@ using Test
 
     # Bernoulli distribution
     values = Bernoulli.(rand(10))
-    ms = mode.(values) .+ 1
+    ms = mode.(values)
     hs = entropy.(values)
     a, b = 0.0, log(2)
     αs = 1.0 .- (hs .- a) ./ (b - a)
-    colors = colorfy(ms, alpha=αs)
+    colors = colorfy(ms .+ 1, alpha=αs)
     alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)

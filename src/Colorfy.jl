@@ -125,7 +125,19 @@ end
 
 repr(values::AbstractVector{<:Colorant}, colorscheme, colorrange) = values
 
-repr(values::AbstractVector{<:Number}, colorscheme, colorrange) = get(colorscheme, values, colorrange)
+function repr(values::AbstractVector{<:Number}, colorscheme, colorrange)
+  isna(v) = isnan(v) || isinf(v)
+  if any(isna, values)
+    iinds = findall(isna, values)
+    vinds = setdiff(1:length(values), iinds)
+    vvals = nonmissingvec(values[vinds])
+    vcolor = get(colorscheme, vvals, colorrange)
+    icolor = colorant"transparent"
+    genvec(vinds, vcolor, iinds, icolor)
+  else
+    get(colorscheme, values, colorrange)
+  end
+end
 
 repr(values::AbstractVector{<:Symbol}, colorscheme, colorrange) = repr(map(string, values), colorscheme, colorrange)
 
@@ -136,7 +148,17 @@ repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(map(DateTim
 repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) =
   repr(map(datetime2unix, values), colorscheme, colorrange)
 
-nominal(values::AbstractVector{<:Number}) = values
+function nominal(values::AbstractVector{<:Number})
+  isna(v) = isnan(v) || isinf(v)
+  if any(isna, values)
+    iinds = findall(isna, values)
+    vinds = setdiff(1:length(values), iinds)
+    vvals = nonmissingvec(values[vinds])
+    genvec(vinds, vvals, iinds, missing)
+  else
+    values
+  end
+end
 
 nominal(values::AbstractVector{<:Date}) = nominal(map(DateTime, values))
 
