@@ -131,6 +131,15 @@ using Test
     @test colorfy(values) == colorfy([1, 2, 3, 4, 5])
     @test Colorfy.nominal(values) == [1, 2, 3, 4, 5]
 
+    # Vector{<:AbstractFloat} with NaN and Inf values
+    values = [0.1, 0.2, 0.3, NaN, Inf, -Inf]
+    colors = colorfy(values)
+    @test colors[1:3] == colorfy(values[1:3])
+    @test colors[4] == colorant"transparent"
+    @test colors[5] == colorant"transparent"
+    @test colors[6] == colorant"transparent"
+    @test isequal(Colorfy.nominal(values), [0.1, 0.2, 0.3, missing, missing, missing])
+
     # error: unsupported values
     values = [nothing, nothing, nothing]
     @test_throws ArgumentError colorfy(values)
