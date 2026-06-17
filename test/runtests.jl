@@ -131,6 +131,15 @@ using Test
     @test colorfy(values) == colorfy([1, 2, 3, 4, 5])
     @test Colorfy.nominal(values) == [1, 2, 3, 4, 5]
 
+    # Vector{<:AbstractFloat} with NaN and Inf values
+    values = [0.1, 0.2, 0.3, NaN, Inf, -Inf]
+    colors = colorfy(values)
+    @test colors[1:3] == colorfy(values[1:3])
+    @test colors[4] == colorant"transparent"
+    @test colors[5] == colorant"transparent"
+    @test colors[6] == colorant"transparent"
+    @test isequal(Colorfy.nominal(values), [0.1, 0.2, 0.3, missing, missing, missing])
+
     # error: unsupported values
     values = [nothing, nothing, nothing]
     @test_throws ArgumentError colorfy(values)
@@ -199,11 +208,11 @@ using Test
 
     # Bernoulli distribution
     values = Bernoulli.(rand(10))
-    ms = mode.(values) .+ 1
+    ms = mode.(values)
     hs = entropy.(values)
     a, b = 0.0, log(2)
     αs = 1.0 .- (hs .- a) ./ (b - a)
-    colors = colorfy(ms, alpha=αs)
+    colors = colorfy(ms .+ 1, alpha=αs)
     alphas = map(Colors.alpha, colors)
     @test colorfy(values) == colors
     @test colorfy(values, alpha=0.5) == coloralpha.(colors, 0.5 * alphas)
@@ -260,7 +269,7 @@ using Test
   end
 
   @testset "Advanced tests" begin
-    # distributions and missing values are handled together
+    # distributions and missing values
     values = [missing, Normal(0.5, 0.5), Normal(0.6, 0.6), Normal(0.7, 0.7), missing]
     colors = colorfy(values)
     @test colors[1] == colorant"transparent"
@@ -269,5 +278,14 @@ using Test
     @test colors[4] != colorant"transparent"
     @test colors[5] == colorant"transparent"
     @test isequal(Colorfy.nominal(values), [missing, 0.5, 0.6, 0.7, missing])
+
+    # distributions and NaN/Inf values
+    values = Dirac.([0.1, 0.2, 0.3, NaN, Inf, -Inf])
+    colors = colorfy(values)
+    @test colors[1:3] == colorfy(values[1:3])
+    @test colors[4] == colorant"transparent"
+    @test colors[5] == colorant"transparent"
+    @test colors[6] == colorant"transparent"
+    @test isequal(Colorfy.nominal(values), [0.1, 0.2, 0.3, missing, missing, missing])
   end
 end

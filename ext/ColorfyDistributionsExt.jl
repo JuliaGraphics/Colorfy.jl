@@ -9,9 +9,6 @@ using Colors
 
 import Colorfy
 
-Colorfy.repr(values::AbstractVector{<:Dirac}, colorscheme, colorrange) =
-  Colorfy.repr(mode.(values), colorscheme, colorrange)
-
 function Colorfy.repr(values::AbstractVector{<:Normal}, colorscheme, colorrange)
   # extract location and entropy
   ms = map(location, values)
@@ -32,15 +29,18 @@ function Colorfy.repr(values::AbstractVector{<:Normal}, colorscheme, colorrange)
   map(coloralpha, cs, αs)
 end
 
+Colorfy.repr(values::AbstractVector{<:Dirac}, colorscheme, colorrange) =
+  Colorfy.repr(mode.(values), colorscheme, colorrange)
+
 function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colorscheme, colorrange)
   # extract mode and entropy
-  ms = map(v -> mode(v) + 1, values)
+  ms = map(mode, values)
   hs = map(entropy, values)
 
   # derive base colors from mode
   n = 2
   c = colorscheme[range(0, 1, length=n)]
-  cs = c[ms]
+  cs = c[ms .+ 1]
 
   # derive transparency from entropy
   a, b = 0.0, log(n)
@@ -76,10 +76,8 @@ function Colorfy.repr(values::AbstractVector{<:Categorical}, colorscheme, colorr
   map(coloralpha, cs, αs)
 end
 
-Colorfy.nominal(values::AbstractVector{<:Bernoulli}) = map(v -> mode(v) + 1, values)
+Colorfy.nominal(values::AbstractVector{<:ContinuousUnivariateDistribution}) = Colorfy.nominal(map(location, values))
 
-Colorfy.nominal(values::AbstractVector{<:ContinuousUnivariateDistribution}) = map(location, values)
-
-Colorfy.nominal(values::AbstractVector{<:DiscreteUnivariateDistribution}) = map(mode, values)
+Colorfy.nominal(values::AbstractVector{<:DiscreteUnivariateDistribution}) = Colorfy.nominal(map(mode, values))
 
 end
