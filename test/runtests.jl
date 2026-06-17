@@ -279,8 +279,8 @@ using Test
     @test colors[5] == colorant"transparent"
     @test isequal(Colorfy.nominal(values), [missing, 0.5, 0.6, 0.7, missing])
 
-    # NaN and Inf values with units
-    values = [0.1, 0.2, 0.3, NaN, Inf, -Inf] * u"K"
+    # distributions and NaN/Inf values
+    values = Dirac.([0.1, 0.2, 0.3, NaN, Inf, -Inf])
     colors = colorfy(values)
     @test colors[1:3] == colorfy(values[1:3])
     @test colors[4] == colorant"transparent"
