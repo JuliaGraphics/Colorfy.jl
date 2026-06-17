@@ -39,7 +39,7 @@ function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colorscheme, colorran
 
   # derive base colors from mode
   n = 2
-  c = colorscheme[range(0, 1, length=n)]
+  c = get(colorscheme, 1:n, colorrange)
   cs = c[ms .+ 1]
 
   # derive transparency from entropy
@@ -51,17 +51,13 @@ function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colorscheme, colorran
 end
 
 function Colorfy.repr(values::AbstractVector{<:Categorical}, colorscheme, colorrange)
-  # sanity check
-  ns = map(ncategories, values)
-  allequal(ns) || throw(ArgumentError("all categorical distributions must have the same number of categories"))
-
   # extract mode and entropy
   ms = map(mode, values)
   hs = map(entropy, values)
 
   # derive base colors from mode
-  n = first(ns)
-  c = colorscheme[range(n > 1 ? 0 : 1, 1, length=n)]
+  n = ncategories(first(values))
+  c = get(colorscheme, 1:n, colorrange)
   cs = c[ms]
 
   # derive transparency from entropy
