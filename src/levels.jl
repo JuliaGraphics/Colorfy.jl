@@ -14,7 +14,28 @@ number of levels (e.g., categorical, compositional).
 By default, it returns an empty vector to indicate
 that there are no levels (i.e., continuous data).
 """
-levels(values) = Int[]
+function levels(values)
+  if any(isinvalid, values)
+    # find invalid and valid indices
+    iinds = findall(isinvalid, values)
+    vinds = setdiff(1:length(values), iinds)
+
+    # if all values are invalid, return an empty vector
+    isempty(vinds) && return Int[]
+
+    # construct levels for valid values
+    levels(nonmissingvec(values[vinds]))
+  else
+    # use an identity map to get concrete element type
+    levels(map(identity, values))
+  end
+end
+
+levels(values::AbstractVector{<:Number}) = Int[]
+
+levels(values::AbstractVector{<:Date}) = Int[]
+
+levels(values::AbstractVector{<:DateTime}) = Int[]
 
 """
     nlevels(values)

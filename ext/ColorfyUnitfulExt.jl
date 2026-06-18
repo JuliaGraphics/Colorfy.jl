@@ -14,4 +14,6 @@ Colorfy.repr(values::AbstractVector{<:Quantity}, colorscheme, colorrange) =
 
 Colorfy.nominal(values::AbstractVector{<:Quantity}) = Colorfy.nominal(map(ustrip, values))
 
+Colorfy.levels(values::AbstractVector{<:Quantity}) = Int[]
+
 end

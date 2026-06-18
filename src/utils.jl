@@ -4,8 +4,6 @@
 
 fixcolors(colors) = convert.(floattype(eltype(colors)), colors)
 
-discretescheme(colorscheme, n) = colorscheme # TODO
-
 isinvalid(value) = ismissing(value) || (value isa Number && !isfinite(value))
 
 nonmissingvec(values::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, values)
