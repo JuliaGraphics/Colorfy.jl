@@ -71,7 +71,7 @@ end
 function ascolormap(colorscheme, values)
   nl = nlevels(values)
   cs = ascolorscheme(colorscheme)
-  isfinite(nl) ? ColorScheme(get(cs, 1:nl, :extrema)) : cs
+  isfinite(nl) ? discretescheme(cs, nl) : cs
 end
 
 ascolorscheme(colorscheme::Symbol) = colorschemes[colorscheme]
@@ -187,9 +187,11 @@ nlevels(values) = Inf
 # HELPER FUNCTIONS
 # -----------------
 
-isinvalid(value) = ismissing(value) || (value isa Number && !isfinite(value))
-
 fixcolors(colors) = convert.(floattype(eltype(colors)), colors)
+
+discretescheme(colorscheme, n) = colorscheme # TODO
+
+isinvalid(value) = ismissing(value) || (value isa Number && !isfinite(value))
 
 nonmissingvec(values::AbstractVector{T}) where {T} = convert(AbstractVector{nonmissingtype(T)}, values)
 

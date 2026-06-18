@@ -29,7 +29,7 @@ function Colorfy.repr(values::AbstractVector{<:Normal}, colormap, colorrange)
 end
 
 Colorfy.repr(values::AbstractVector{<:Dirac}, colormap, colorrange) =
-  Colorfy.repr(map(mode, values), colormap, colorrange)
+  Colorfy.repr(map(mode, values), colormap, colorrange) # TODO
 
 function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colormap, colorrange)
   # derive base colors from mode
