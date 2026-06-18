@@ -10,22 +10,18 @@ using Colors: coloralpha
 
 import Colorfy
 
-function Colorfy.repr(values::AbstractVector{<:Composition}, colorscheme, colorrange)
-  # compute probabilities
-  ps = map(values) do v
-    cs = components(v)
-    cs ./ sum(cs)
-  end
+function Colorfy.repr(values::AbstractVector{<:Composition}, colormap, colorrange)
+  # derive base color from mode
+  n = Colorfy.nlevels(values)
+  c = get(colormap, 1:n, colorrange)
+  cs = c[Colorfy.nominal(values)]
 
   # compute Shannon entropy
-  hs = map(ps) do p
+  hs = map(values) do v
+    c = components(v)
+    p = c ./ sum(c)
     -sum(pᵢ * log(pᵢ) for pᵢ in p if pᵢ > 0)
   end
-
-  # derive base color from mode
-  n = length(first(ps))
-  c = get(colorscheme, 1:n, colorrange)
-  cs = c[map(argmax, ps)]
 
   # derive transparency from entropy
   a, b = 0.0, log(n)
@@ -36,5 +32,7 @@ function Colorfy.repr(values::AbstractVector{<:Composition}, colorscheme, colorr
 end
 
 Colorfy.nominal(values::AbstractVector{<:Composition}) = map(argmax ∘ components, values)
+
+Colorfy.nlevels(values::AbstractVector{<:Composition}) = length(components(first(values)))
 
 end

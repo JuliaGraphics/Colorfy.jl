@@ -9,13 +9,12 @@ using Colors
 
 import Colorfy
 
-function Colorfy.repr(values::AbstractVector{<:Normal}, colorscheme, colorrange)
-  # extract location and entropy
-  ms = map(location, values)
-  hs = map(entropy, values)
-
+function Colorfy.repr(values::AbstractVector{<:Normal}, colormap, colorrange)
   # derive base colors from location
-  cs = Colorfy.repr(ms, colorscheme, colorrange)
+  cs = Colorfy.repr(Colorfy.nominal(values), colormap, colorrange)
+
+  # compute Shannon entropy
+  hs = map(entropy, values)
 
   # derive transparency from entropy
   a, b = extrema(hs)
@@ -29,17 +28,16 @@ function Colorfy.repr(values::AbstractVector{<:Normal}, colorscheme, colorrange)
   map(coloralpha, cs, αs)
 end
 
-Colorfy.repr(values::AbstractVector{<:Dirac}, colorscheme, colorrange) =
-  Colorfy.repr(mode.(values), colorscheme, colorrange)
+Colorfy.repr(values::AbstractVector{<:Dirac}, colormap, colorrange) =
+  Colorfy.repr(map(mode, values), colormap, colorrange)
 
-function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colorscheme, colorrange)
-  # extract mode and entropy
-  ms = map(mode, values)
-  hs = map(entropy, values)
-
+function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colormap, colorrange)
   # derive base colors from mode
-  c = get(colorscheme, 0:1, colorrange)
-  cs = c[ms .+ 1]
+  c = get(colormap, 0:1, colorrange)
+  cs = c[Colorfy.nominal(values) .+ 1]
+
+  # compute Shannon entropy
+  hs = map(entropy, values)
 
   # derive transparency from entropy
   a, b = 0.0, log(2)
@@ -49,15 +47,14 @@ function Colorfy.repr(values::AbstractVector{<:Bernoulli}, colorscheme, colorran
   map(coloralpha, cs, αs)
 end
 
-function Colorfy.repr(values::AbstractVector{<:Categorical}, colorscheme, colorrange)
-  # extract mode and entropy
-  ms = map(mode, values)
-  hs = map(entropy, values)
-
+function Colorfy.repr(values::AbstractVector{<:Categorical}, colormap, colorrange)
   # derive base colors from mode
-  n = ncategories(first(values))
-  c = get(colorscheme, 1:n, colorrange)
-  cs = c[ms]
+  n = Colorfy.nlevels(values)
+  c = get(colormap, 1:n, colorrange)
+  cs = c[Colorfy.nominal(values)]
+
+  # compute Shannon entropy
+  hs = map(entropy, values)
 
   # derive transparency from entropy
   a, b = 0.0, log(n)
@@ -74,5 +71,11 @@ end
 Colorfy.nominal(values::AbstractVector{<:ContinuousUnivariateDistribution}) = Colorfy.nominal(map(location, values))
 
 Colorfy.nominal(values::AbstractVector{<:DiscreteUnivariateDistribution}) = Colorfy.nominal(map(mode, values))
+
+Colorfy.nlevels(values::AbstractVector{<:Dirac}) = 1
+
+Colorfy.nlevels(values::AbstractVector{<:Bernoulli}) = 2
+
+Colorfy.nlevels(values::AbstractVector{<:Categorical}) = ncategories(first(values))
 
 end
