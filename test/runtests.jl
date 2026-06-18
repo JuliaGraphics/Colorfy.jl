@@ -10,7 +10,7 @@ using Dates
 using Test
 
 @testset "Colorfy.jl" begin
-  @testset "Handle arguments" begin
+  @testset "Preprocess" begin
     values = rand(10)
     vs, αs, cs, cr = Colorfy.preprocess(values, 1.0, :viridis, :extrema)
     @test vs == values
