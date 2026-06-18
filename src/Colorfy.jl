@@ -125,8 +125,7 @@ repr(values::AbstractVector{<:AbstractString}, colormap, colorrange) = map(v -> 
 
 repr(values::AbstractVector{<:Date}, colormap, colorrange) = repr(map(DateTime, values), colormap, colorrange)
 
-repr(values::AbstractVector{<:DateTime}, colormap, colorrange) =
-  repr(map(datetime2unix, values), colormap, colorrange)
+repr(values::AbstractVector{<:DateTime}, colormap, colorrange) = repr(map(datetime2unix, values), colormap, colorrange)
 
 """
     nominal(values)
