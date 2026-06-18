@@ -9,14 +9,16 @@ using CategoricalArrays: levels, levelcode
 
 import Colorfy
 
-function Colorfy.repr(values::AbstractVector{<:CategoricalValue}, colorscheme, colorrange)
+function Colorfy.repr(values::AbstractVector{<:CategoricalValue}, colormap, colorrange)
   # not all levels may be present in the input values,
   # so we need to get the number of levels from the type
-  n = length(levels(values))
-  c = get(colorscheme, 1:n, colorrange)
-  c[map(levelcode, values)]
+  n = Colorfy.nlevels(values)
+  c = get(colormap, 1:n, colorrange)
+  c[Colorfy.nominal(values)]
 end
 
 Colorfy.nominal(values::AbstractVector{<:CategoricalValue}) = map(levelcode, values)
+
+Colorfy.nlevels(values::AbstractVector{<:CategoricalValue}) = length(levels(values))
 
 end
