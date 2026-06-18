@@ -12,69 +12,69 @@ using Test
 @testset "Colorfy.jl" begin
   @testset "Handle arguments" begin
     values = rand(10)
-    vs, αs, s, r = Colorfy.handleargs(values, 1.0, :viridis, :extrema)
+    vs, αs, cs, cr = Colorfy.preprocess(values, 1.0, :viridis, :extrema)
     @test vs == values
     @test αs == fill(1, 10)
-    @test s == colorschemes[:viridis]
-    @test r == :extrema
+    @test cs == colorschemes[:viridis]
+    @test cr == :extrema
 
     values = [Gray(rand()) for _ in 1:10]
-    vs, αs, s, r = Colorfy.handleargs(values, 1.0, :viridis, :extrema)
+    vs, αs, cs, cr = Colorfy.preprocess(values, 1.0, :viridis, :extrema)
     @test eltype(vs) <: Gray
     @test eltype(eltype(vs)) <: AbstractFloat
     @test vs == values
     @test αs == fill(1, 10)
-    @test s == colorschemes[:viridis]
-    @test r == :extrema
+    @test cs == colorschemes[:viridis]
+    @test cr == :extrema
 
     for Q in (Q0f7, Q0f15, Q0f31, Q0f63)
       values = [Gray(rand(Q)) for _ in 1:10]
-      vs, αs, s, r = Colorfy.handleargs(values, 1.0, :viridis, :extrema)
+      vs, αs, cs, cr = Colorfy.preprocess(values, 1.0, :viridis, :extrema)
       @test eltype(vs) <: Gray
       @test eltype(eltype(vs)) <: AbstractFloat
       @test vs == values
       @test αs == fill(1, 10)
-      @test s == colorschemes[:viridis]
-      @test r == :extrema
+      @test cs == colorschemes[:viridis]
+      @test cr == :extrema
     end
 
     values = rand(10)
-    vs, αs, s, r = Colorfy.handleargs(values, 0.5, :viridis, :extrema)
+    vs, αs, cs, cr = Colorfy.preprocess(values, 0.5, :viridis, :extrema)
     @test αs == fill(0.5, 10)
 
     values = rand(10)
-    vs, αs, s, r = Colorfy.handleargs(values, 1.0, :grays, :extrema)
-    @test s == colorschemes[:grays]
+    vs, αs, cs, cr = Colorfy.preprocess(values, 1.0, :grays, :extrema)
+    @test cs == colorschemes[:grays]
 
     values = rand(10)
-    vs, αs, s, r = Colorfy.handleargs(values, 1.0, "grays", :extrema)
-    @test s == colorschemes[:grays]
+    vs, αs, cs, cr = Colorfy.preprocess(values, 1.0, "grays", :extrema)
+    @test cs == colorschemes[:grays]
 
     values = rand(10)
-    vs, αs, s, r = Colorfy.handleargs(values, 1.0, ["black", "white"], :extrema)
-    @test s[0.0] == colorant"black"
-    @test s[1.0] == colorant"white"
+    vs, αs, cs, cr = Colorfy.preprocess(values, 1.0, ["black", "white"], :extrema)
+    @test cs[0.0] == colorant"black"
+    @test cs[1.0] == colorant"white"
 
     values = rand(10)
-    vs, αs, s, r = Colorfy.handleargs(values, 1.0, :viridis, (0.25, 0.75))
-    @test r == (0.25, 0.75)
+    vs, αs, cs, cr = Colorfy.preprocess(values, 1.0, :viridis, (0.25, 0.75))
+    @test cr == (0.25, 0.75)
 
     values = rand(10)
-    vs, αs, s, r = Colorfy.handleargs(values, 1.0, :viridis, (0, 0.5))
-    @test r == (0.0, 0.5)
+    vs, αs, cs, cr = Colorfy.preprocess(values, 1.0, :viridis, (0, 0.5))
+    @test cr == (0.0, 0.5)
 
     values = rand(10)
     alphas = rand(10)
-    vs, αs, s, r = Colorfy.handleargs(values, alphas, colorschemes[:grays], (0.25, 0.75))
+    vs, αs, cs, cr = Colorfy.preprocess(values, alphas, colorschemes[:grays], (0.25, 0.75))
     @test vs == values
     @test αs == alphas
-    @test s == colorschemes[:grays]
-    @test r == (0.25, 0.75)
+    @test cs == colorschemes[:grays]
+    @test cr == (0.25, 0.75)
 
     # error: the number of alphas must be equal to the number of values
     values = rand(10)
     alphas = rand(9)
-    @test_throws ArgumentError Colorfy.handleargs(values, alphas, :viridis, :extrema)
+    @test_throws ArgumentError Colorfy.preprocess(values, alphas, :viridis, :extrema)
   end
 
   @testset "Basic tests" begin

@@ -10,10 +10,10 @@ using Colors: coloralpha
 
 import Colorfy
 
-function Colorfy.repr(values::AbstractVector{<:Composition}, colormap, colorrange)
+function Colorfy.repr(values::AbstractVector{<:Composition}, colorscheme, colorrange)
   # derive base color from mode
   n = Colorfy.nlevels(values)
-  c = get(colormap, 1:n, colorrange)
+  c = get(colorscheme, 1:n, colorrange)
   cs = c[Colorfy.nominal(values)]
 
   # compute Shannon entropy

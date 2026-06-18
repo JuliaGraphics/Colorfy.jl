@@ -24,7 +24,7 @@ Convert `values` to Colors.jl colors based on given options.
 """
 function colorfy(values; alpha=1.0, colorscheme=:viridis, colorrange=:extrema)
   # handle input arguments
-  vs, αs, cm, cr = handleargs(values, alpha, colorscheme, colorrange)
+  vs, αs, cs, cr = preprocess(values, alpha, colorscheme, colorrange)
 
   # find invalid and valid indices
   iinds = findall(isinvalid, vs)
@@ -34,7 +34,7 @@ function colorfy(values; alpha=1.0, colorscheme=:viridis, colorrange=:extrema)
   isempty(vinds) && return fill(colorant"transparent", length(values))
 
   # construct colors for valid values
-  rcolors = repr(nonmissingvec(vs[vinds]), cm, cr)
+  rcolors = repr(nonmissingvec(vs[vinds]), cs, cr)
   ralphas = map(Colors.alpha, rcolors)
   vcolors = coloralpha.(rcolors, αs[vinds] .* ralphas)
 
@@ -46,12 +46,12 @@ function colorfy(values; alpha=1.0, colorscheme=:viridis, colorrange=:extrema)
   end
 end
 
-function handleargs(values, alphas, colorscheme, colorrange)
+function preprocess(values, alphas, colorscheme, colorrange)
   vs = asvalues(values)
   αs = asalphas(alphas, vs)
-  cm = ascolormap(colorscheme, vs)
+  cs = ascolorscheme(colorscheme, vs)
   cr = ascolorrange(colorrange)
-  vs, αs, cm, cr
+  vs, αs, cs, cr
 end
 
 asvalues(values) = values
@@ -68,10 +68,10 @@ function asalphas(alphas::AbstractVector, values)
   alphas
 end
 
-function ascolormap(colorscheme, values)
+function ascolorscheme(colorscheme, values)
   nl = nlevels(values)
   cs = ascolorscheme(colorscheme)
-  isfinite(nl) ? discretescheme(cs, nl) : cs
+  iszero(nl) ? cs : discretescheme(cs, nl)
 end
 
 ascolorscheme(colorscheme::Symbol) = colorschemes[colorscheme]
@@ -90,11 +90,11 @@ end
 # ----------------
 
 """
-    repr(values, colormap, colorrange)
+    repr(values, colorscheme, colorrange)
 
-Colorful representation of `values` based on `colormap` and `colorrange`.
+Colorful representation of `values` based on `colorscheme` and `colorrange`.
 """
-function repr(values::AbstractVector{T}, colormap, colorrange) where {T}
+function repr(values::AbstractVector{T}, colorscheme, colorrange) where {T}
   throw(ArgumentError("""
     values of type `$T` do not have a colorful representation.
 
@@ -103,29 +103,29 @@ function repr(values::AbstractVector{T}, colormap, colorrange) where {T}
     """))
 end
 
-repr(values::AbstractVector{<:Colorant}, colormap, colorrange) = values
+repr(values::AbstractVector{<:Colorant}, colorscheme, colorrange) = values
 
-function repr(values::AbstractVector{<:Number}, colormap, colorrange)
+function repr(values::AbstractVector{<:Number}, colorscheme, colorrange)
   isna(v) = isnan(v) || isinf(v)
   if any(isna, values)
     iinds = findall(isna, values)
     vinds = setdiff(1:length(values), iinds)
     vvals = nonmissingvec(values[vinds])
-    vcolor = get(colormap, vvals, colorrange)
+    vcolor = get(colorscheme, vvals, colorrange)
     icolor = colorant"transparent"
     genvec(vinds, vcolor, iinds, icolor)
   else
-    get(colormap, values, colorrange)
+    get(colorscheme, values, colorrange)
   end
 end
 
-repr(values::AbstractVector{<:Symbol}, colormap, colorrange) = repr(map(string, values), colormap, colorrange)
+repr(values::AbstractVector{<:Symbol}, colorscheme, colorrange) = repr(map(string, values), colorscheme, colorrange)
 
-repr(values::AbstractVector{<:AbstractString}, colormap, colorrange) = map(v -> parse(Colorant, v), values)
+repr(values::AbstractVector{<:AbstractString}, colorscheme, colorrange) = map(v -> parse(Colorant, v), values)
 
-repr(values::AbstractVector{<:Date}, colormap, colorrange) = repr(map(DateTime, values), colormap, colorrange)
+repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(map(DateTime, values), colorscheme, colorrange)
 
-repr(values::AbstractVector{<:DateTime}, colormap, colorrange) = repr(map(datetime2unix, values), colormap, colorrange)
+repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) = repr(map(datetime2unix, values), colorscheme, colorrange)
 
 """
     nominal(values)
@@ -177,10 +177,10 @@ Number of levels in `values` for color mapping.
 
 This function is used to determine the number of
 colors needed for categorical data. By default,
-it returns `Inf` to indicate that the number of
+it returns `0` to indicate that the number of
 levels is infinite (i.e., continuous data).
 """
-nlevels(values) = Inf
+nlevels(values) = 0
 
 # -----------------
 # HELPER FUNCTIONS

@@ -9,8 +9,8 @@ using Unitful: ustrip
 
 import Colorfy
 
-Colorfy.repr(values::AbstractVector{<:Quantity}, colormap, colorrange) =
-  Colorfy.repr(Colorfy.nominal(values), colormap, colorrange)
+Colorfy.repr(values::AbstractVector{<:Quantity}, colorscheme, colorrange) =
+  Colorfy.repr(Colorfy.nominal(values), colorscheme, colorrange)
 
 Colorfy.nominal(values::AbstractVector{<:Quantity}) = Colorfy.nominal(map(ustrip, values))
 
