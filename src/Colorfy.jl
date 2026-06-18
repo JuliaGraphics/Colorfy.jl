@@ -120,10 +120,9 @@ repr(values::AbstractVector{<:Symbol}, colorscheme, colorrange) = repr(map(strin
 
 repr(values::AbstractVector{<:AbstractString}, colorscheme, colorrange) = map(v -> parse(Colorant, v), values)
 
-repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(map(DateTime, values), colorscheme, colorrange)
+repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(nominal(values), colorscheme, colorrange)
 
-repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) =
-  repr(map(datetime2unix, values), colorscheme, colorrange)
+repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) = repr(nominal(values), colorscheme, colorrange)
 
 """
     nominal(values)
