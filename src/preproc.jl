@@ -5,7 +5,7 @@
 function preprocess(values, alphas, colorscheme, colorrange)
   vs = asvalues(values)
   αs = asalphas(alphas, vs)
-  cs = ascolorscheme(colorscheme, vs)
+  cs = ascolorscheme(colorscheme)
   cr = ascolorrange(colorrange)
   vs, αs, cs, cr
 end
@@ -22,12 +22,6 @@ function asalphas(alphas::AbstractVector, values)
     throw(ArgumentError("the number of alphas must be equal to the number of values"))
   end
   alphas
-end
-
-function ascolorscheme(colorscheme, values)
-  nl = nlevels(values)
-  cs = ascolorscheme(colorscheme)
-  iszero(nl) ? cs : discretescheme(cs, nl)
 end
 
 ascolorscheme(colorscheme::Symbol) = colorschemes[colorscheme]
