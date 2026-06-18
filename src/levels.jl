@@ -3,13 +3,24 @@
 # -----------------------------------------------------------------
 
 """
+    levels(values)
+
+Levels in `values` for color mapping.
+
+This function is used to determine the number of
+colors needed for scientific types with a finite
+number of levels (e.g., categorical, compositional).
+
+By default, it returns an empty vector to indicate
+that there are no levels (i.e., continuous data).
+"""
+levels(values) = Int[]
+
+"""
     nlevels(values)
 
 Number of levels in `values` for color mapping.
 
-This function is used to determine the number of
-colors needed for categorical data. By default,
-it returns `0` to indicate that the number of
-levels is infinite (i.e., continuous data).
+See [`levels`](@ref) for more details.
 """
-nlevels(values) = 0
+nlevels(values) = length(levels(values))

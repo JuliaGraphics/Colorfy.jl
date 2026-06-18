@@ -19,6 +19,6 @@ end
 
 Colorfy.nominal(values::AbstractVector{<:CategoricalValue}) = map(levelcode, values)
 
-Colorfy.nlevels(values::AbstractVector{<:CategoricalValue}) = length(levels(values))
+Colorfy.levels(values::AbstractVector{<:CategoricalValue}) = levels(values)
 
 end
