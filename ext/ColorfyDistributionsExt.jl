@@ -72,10 +72,10 @@ Colorfy.nominal(values::AbstractVector{<:ContinuousUnivariateDistribution}) = Co
 
 Colorfy.nominal(values::AbstractVector{<:DiscreteUnivariateDistribution}) = Colorfy.nominal(map(mode, values))
 
-Colorfy.nlevels(values::AbstractVector{<:Dirac}) = 1
+Colorfy.levels(values::AbstractVector{<:Dirac}) = 1:1
 
-Colorfy.nlevels(values::AbstractVector{<:Bernoulli}) = 2
+Colorfy.levels(values::AbstractVector{<:Bernoulli}) = 0:1
 
-Colorfy.nlevels(values::AbstractVector{<:Categorical}) = ncategories(first(values))
+Colorfy.levels(values::AbstractVector{<:Categorical}) = 1:ncategories(first(values))
 
 end

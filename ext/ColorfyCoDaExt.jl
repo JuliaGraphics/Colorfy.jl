@@ -6,6 +6,7 @@ module ColorfyCoDaExt
 
 using CoDa: Composition
 using CoDa: components
+using CoDa: parts
 using Colors: coloralpha
 
 import Colorfy
@@ -33,6 +34,6 @@ end
 
 Colorfy.nominal(values::AbstractVector{<:Composition}) = map(argmax ∘ components, values)
 
-Colorfy.nlevels(values::AbstractVector{<:Composition}) = length(components(first(values)))
+Colorfy.levels(values::AbstractVector{<:Composition}) = collect(parts(first(values)))
 
 end
