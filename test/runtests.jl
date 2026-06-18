@@ -140,11 +140,12 @@ using Test
     @test colors[6] == colorant"transparent"
     @test isequal(Colorfy.nominal(values), [0.1, 0.2, 0.3, missing, missing, missing])
 
-    # error: unsupported values
-    values = [nothing, nothing, nothing]
-    @test_throws ArgumentError colorfy(values)
-    values = Any[:red, :green, :blue] # vector with non-concrete eltype
-    @test_throws ArgumentError colorfy(values)
+    # vector with non-concrete eltype
+    values = Any[:red, :green, :blue]
+    colors = colorfy(values)
+    @test colors[1] == coloralpha(colorant"red", 1)
+    @test colors[2] == coloralpha(colorant"green", 1)
+    @test colors[3] == coloralpha(colorant"blue", 1)
   end
 
   @testset "Dates" begin

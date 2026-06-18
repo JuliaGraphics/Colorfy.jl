@@ -23,27 +23,15 @@ Convert `values` to Colors.jl colors based on given options.
 * `colorrange`  - minimum and maximum color values or symbol (see `ColorSchemes.get`)
 """
 function colorfy(values; alpha=1.0, colorscheme=:viridis, colorrange=:extrema)
-  # handle input arguments
+  # preprocess input arguments
   vs, αs, cs, cr = preprocess(values, alpha, colorscheme, colorrange)
 
-  # find invalid and valid indices
-  iinds = findall(isinvalid, vs)
-  vinds = setdiff(1:length(vs), iinds)
+  # construct colorful representation
+  colors = repr(vs, cs, cr)
+  alphas = map(Colors.alpha, colors)
 
-  # if all values are invalid, return transparent colors
-  isempty(vinds) && return fill(colorant"transparent", length(values))
-
-  # construct colors for valid values
-  rcolors = repr(nonmissingvec(vs[vinds]), cs, cr)
-  ralphas = map(Colors.alpha, rcolors)
-  vcolors = coloralpha.(rcolors, αs[vinds] .* ralphas)
-
-  # construct colors for all values
-  if isempty(iinds) # all values are valid, return colors directly
-    vcolors
-  else # set "transparent" color for invalid values
-    genvec(vinds, vcolors, iinds, colorant"transparent")
-  end
+  # adjust transparency if necessary
+  coloralpha.(colors, αs .* alphas)
 end
 
 function preprocess(values, alphas, colorscheme, colorrange)
@@ -94,38 +82,47 @@ end
 
 Colorful representation of `values` based on `colorscheme` and `colorrange`.
 """
-function repr(values::AbstractVector{T}, colorscheme, colorrange) where {T}
-  throw(ArgumentError("""
-    values of type `$T` do not have a colorful representation.
+function repr(values, colorscheme, colorrange)
+  if any(isinvalid, values)
+    # find invalid and valid indices
+    iinds = findall(isinvalid, values)
+    vinds = setdiff(1:length(values), iinds)
 
-    Please make sure your vector has a concrete element type
-    and that a `Colorfy.repr` method exists for it.
-    """))
+    # if all values are invalid, return transparent colors
+    isempty(vinds) && return fill(colorant"transparent", length(values))
+
+    # construct colors for valid values
+    vcolors = repr(nonmissingvec(values[vinds]), colorscheme, colorrange)
+
+    # construct colors for all values
+    genvec(vinds, vcolors, iinds, colorant"transparent")
+  else
+    # use an identity map to get concrete element type
+    repr(map(identity, values), colorscheme, colorrange)
+  end
 end
-
-repr(values::AbstractVector{<:Colorant}, colorscheme, colorrange) = values
 
 function repr(values::AbstractVector{<:Number}, colorscheme, colorrange)
   isna(v) = isnan(v) || isinf(v)
   if any(isna, values)
     iinds = findall(isna, values)
     vinds = setdiff(1:length(values), iinds)
-    vvals = nonmissingvec(values[vinds])
-    vcolor = get(colorscheme, vvals, colorrange)
-    icolor = colorant"transparent"
-    genvec(vinds, vcolor, iinds, icolor)
+    vcolors = get(colorscheme, values[vinds], colorrange)
+    genvec(vinds, vcolors, iinds, colorant"transparent")
   else
     get(colorscheme, values, colorrange)
   end
 end
 
+repr(values::AbstractVector{<:Colorant}, colorscheme, colorrange) = values
+
 repr(values::AbstractVector{<:Symbol}, colorscheme, colorrange) = repr(map(string, values), colorscheme, colorrange)
 
 repr(values::AbstractVector{<:AbstractString}, colorscheme, colorrange) = map(v -> parse(Colorant, v), values)
 
-repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(map(DateTime, values), colorscheme, colorrange)
+repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(nominal(values), colorscheme, colorrange)
 
-repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) = repr(map(datetime2unix, values), colorscheme, colorrange)
+repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) = repr(nominal(values), colorscheme, colorrange)
 
 """
     nominal(values)
@@ -136,21 +133,22 @@ This function is used to convert non-numeric values to
 numeric values that can be used in ticks and color bars.
 """
 function nominal(values)
-  # find invalid and valid indices
-  iinds = findall(isinvalid, values)
-  vinds = setdiff(1:length(values), iinds)
+  if any(isinvalid, values)
+    # find invalid and valid indices
+    iinds = findall(isinvalid, values)
+    vinds = setdiff(1:length(values), iinds)
 
-  # if all values are invalid, return missing values
-  isempty(vinds) && return fill(missing, length(values))
+    # if all values are invalid, return missing values
+    isempty(vinds) && return fill(missing, length(values))
 
-  # construct nominal values for valid values
-  vvalues = nominal(nonmissingvec(values[vinds]))
+    # construct nominal values for valid values
+    vvalues = nominal(nonmissingvec(values[vinds]))
 
-  # construct nominal values for all values
-  if isempty(iinds) # all values are valid, return nominal values directly
-    vvalues
-  else # set missing value for invalid values
+    # construct nominal values for all values
     genvec(vinds, vvalues, iinds, missing)
+  else
+    # use an identity map to get concrete element type
+    nominal(map(identity, values))
   end
 end
 
@@ -159,8 +157,7 @@ function nominal(values::AbstractVector{<:Number})
   if any(isna, values)
     iinds = findall(isna, values)
     vinds = setdiff(1:length(values), iinds)
-    vvals = nonmissingvec(values[vinds])
-    genvec(vinds, vvals, iinds, missing)
+    genvec(vinds, values[vinds], iinds, missing)
   else
     values
   end
