@@ -108,11 +108,13 @@ using Test
     colors = colorfy(values)
     result = [colorant"red", colorant"green", colorant"blue", colorant"white", colorant"black"]
     @test colors == coloralpha.(result, 1)
+    @test Colorfy.levels(values) == sort(unique(values))
 
     values = [:red, :green, :blue, :white, :black]
     colors1 = colorfy(values)
     colors2 = colorfy(values, alpha=0.5)
     @test colors2 == coloralpha.(colors1, 0.5)
+    @test Colorfy.levels(values) == sort(unique(values))
 
     values = [:red, :green, :blue, :white, :black]
     alphas = rand(5)
