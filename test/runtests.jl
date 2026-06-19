@@ -90,6 +90,20 @@ using Test
     @test colors == coloralpha.(result, 1)
     @test isempty(Colorfy.levels(values))
 
+    values = rand(Int, 10)
+    colors = colorfy(values)
+    result = get(colorschemes[:viridis], float(values), :extrema)
+    @test colors == coloralpha.(result, 1)
+    @test Colorfy.nominal(values) == values
+    @test Colorfy.levels(values) == sort(unique(values))
+
+    values = rand(Char, 10)
+    colors = colorfy(values)
+    result = get(colorschemes[:viridis], float(map(Int, values)), :extrema)
+    @test colors == coloralpha.(result, 1)
+    @test Colorfy.nominal(values) == map(Int, values)
+    @test Colorfy.levels(values) == sort(unique(values))
+
     values = ["red", "green", "blue", "white", "black"]
     colors = colorfy(values)
     result = [colorant"red", colorant"green", colorant"blue", colorant"white", colorant"black"]
@@ -135,7 +149,7 @@ using Test
     values = Union{Missing,Int}[1, 2, 3, 4, 5]
     @test colorfy(values) == colorfy([1, 2, 3, 4, 5])
     @test Colorfy.nominal(values) == [1, 2, 3, 4, 5]
-    @test isempty(Colorfy.levels(values))
+    @test Colorfy.levels(values) == [1, 2, 3, 4, 5]
 
     # Vector{<:AbstractFloat} with NaN and Inf values
     values = [0.1, 0.2, 0.3, NaN, Inf, -Inf]
@@ -278,6 +292,14 @@ using Test
     @test colorfy(values, colorrange=(0.25u"m", 0.75u"m")) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
     @test Colorfy.nominal(values) == ustrip.(values)
     @test isempty(Colorfy.levels(values))
+
+    values = rand(Int, 10) * u"m"
+    @test colorfy(values) == colorfy(ustrip.(values))
+    @test colorfy(values, alpha=0.5) == colorfy(ustrip.(values), alpha=0.5)
+    @test colorfy(values, colorrange=(0.25, 0.75)) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
+    @test colorfy(values, colorrange=(0.25u"m", 0.75u"m")) == colorfy(ustrip.(values), colorrange=(0.25, 0.75))
+    @test Colorfy.nominal(values) == ustrip.(values)
+    @test Colorfy.levels(values) == sort(unique(values))
   end
 
   @testset "CoDa" begin

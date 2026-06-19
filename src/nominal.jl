@@ -30,7 +30,7 @@ function nominal(values)
   end
 end
 
-function nominal(values::AbstractVector{<:Number})
+function nominal(values::AbstractVector{<:AbstractFloat})
   isna(v) = isnan(v) || isinf(v)
   if any(isna, values)
     iinds = findall(isna, values)
@@ -40,6 +40,10 @@ function nominal(values::AbstractVector{<:Number})
     values
   end
 end
+
+nominal(values::AbstractVector{<:Integer}) = values
+
+nominal(values::AbstractVector{<:AbstractChar}) = map(Int, values)
 
 nominal(values::AbstractVector{<:Date}) = nominal(map(DateTime, values))
 

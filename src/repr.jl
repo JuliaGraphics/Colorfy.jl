@@ -27,7 +27,7 @@ function repr(values, colorscheme, colorrange)
   end
 end
 
-function repr(values::AbstractVector{<:Number}, colorscheme, colorrange)
+function repr(values::AbstractVector{<:AbstractFloat}, colorscheme, colorrange)
   isna(v) = isnan(v) || isinf(v)
   if any(isna, values)
     iinds = findall(isna, values)
@@ -39,12 +39,20 @@ function repr(values::AbstractVector{<:Number}, colorscheme, colorrange)
   end
 end
 
+repr(values::AbstractVector{<:Integer}, colorscheme, colorrange) = get(colorscheme, float(values), colorrange)
+
+repr(values::AbstractVector{<:Char}, colorscheme, colorrange) = repr(nominal(values), colorscheme, colorrange)
+
+repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(nominal(values), colorscheme, colorrange)
+
+repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) = repr(nominal(values), colorscheme, colorrange)
+
+# ---------------------
+# COLOR SPECIFICATIONS
+# ---------------------
+
 repr(values::AbstractVector{<:Colorant}, colorscheme, colorrange) = values
 
 repr(values::AbstractVector{<:Symbol}, colorscheme, colorrange) = repr(map(string, values), colorscheme, colorrange)
 
 repr(values::AbstractVector{<:AbstractString}, colorscheme, colorrange) = map(v -> parse(Colorant, v), values)
-
-repr(values::AbstractVector{<:Date}, colorscheme, colorrange) = repr(nominal(values), colorscheme, colorrange)
-
-repr(values::AbstractVector{<:DateTime}, colorscheme, colorrange) = repr(nominal(values), colorscheme, colorrange)

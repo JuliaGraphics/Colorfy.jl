@@ -5,7 +5,7 @@
 module ColorfyUnitfulExt
 
 using Unitful: Quantity
-using Unitful: ustrip
+using Unitful: ustrip, unit
 
 import Colorfy
 
@@ -14,6 +14,6 @@ Colorfy.repr(values::AbstractVector{<:Quantity}, colorscheme, colorrange) =
 
 Colorfy.nominal(values::AbstractVector{<:Quantity}) = Colorfy.nominal(map(ustrip, values))
 
-Colorfy.levels(values::AbstractVector{<:Quantity}) = Int[]
+Colorfy.levels(values::AbstractVector{<:Quantity}) = Colorfy.levels(Colorfy.nominal(values)) .* unit(first(values))
 
 end

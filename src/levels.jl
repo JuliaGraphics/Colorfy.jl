@@ -31,11 +31,17 @@ function levels(values)
   end
 end
 
-levels(values::AbstractVector{<:Number}) = Int[]
+levels(values::AbstractVector{<:AbstractFloat}) = []
 
-levels(values::AbstractVector{<:Date}) = Int[]
+levels(values::AbstractVector{<:Integer}) = sort(unique(values))
 
-levels(values::AbstractVector{<:DateTime}) = Int[]
+levels(values::AbstractVector{<:AbstractChar}) = sort(unique(values))
+
+levels(values::AbstractVector{<:AbstractString}) = sort(unique(values))
+
+levels(values::AbstractVector{<:Date}) = []
+
+levels(values::AbstractVector{<:DateTime}) = []
 
 """
     nlevels(values)
